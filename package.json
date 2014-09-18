@@ -1,8 +1,8 @@
 {
-  "name": "comongo",
+  "name": "yieldb",
   "version": "0.0.0",
   "description": "MongoDB for co and koa",
-  "main": "comongo.js",
+  "main": "yieldb.js",
   "engines": {
     "node": ">= 0.11.4"
   },
@@ -19,28 +19,25 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/aheckmann/comongo.git"
+    "url": "https://github.com/pebble/yieldb.git"
   },
   "bugs": {
-    "url": "https://github.com/aheckmann/comongo/issues"
+    "url": "https://github.com/pebble/yieldb/issues"
   },
-  "homepage": "https://github.com/aheckmann/monongo",
+  "homepage": "https://github.com/pebble/yieldb",
   "author": "Aaron Heckmann <aaron.heckmann+github@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "debug": "0.8.1",
-    "has-own": "^1.0.0",
-    "is-object": "^1.0.1",
-    "mongo-eql": "0.1.1",
-    "mongo-query": "0.5.2",
+    "has-own": "1.0.0",
+    "is-object": "1.0.1",
     "mongodb": "1.4.10",
-    "oh-crap": "^1.0.1"
+    "mquery": "1.2.0"
   },
   "devDependencies": {
     "co": "^3.0.2",
     "istanbul-harmony": "^0.2.9",
     "mocha": "^1.20.1",
-    "co-mocha": "^1.0.0",
-    "supertest": "^0.13.0"
+    "co-mocha": "^1.0.0"
   }
 }

@@ -1,102 +1,176 @@
-# comongo
+# yieldb
+
+Simple, expressive and yieldable MongoDB.
 
 ```js
+var co = require('co');
+var connect = require('yieldb').connect;
 
-// need a driver collection
-// need a model
-// need instances of model (documents)
+co(function*(){
+  var db = yield connect(url);
 
-// yieldable model actions:
-  - update
-  - insert
-  - findAndModify
-  - remove
-  - find
-  - findOne
-  - aggregate
-  - search
+  var User = db.col('users');
 
-// support _id casting for these methods
+  yield User.find(id)
+  yield User.find(id).stream()
+  yield User.findOne(id)
+  yield User.remove(id)
+  yield User.update(id, { $set: .. })
+  yield User.insert(docs)
+  yield User.findAndModify(id, modifier)
+  yield User.remove(id)
+  yield User.aggregate() // thunk
+  yield User.aggregate().stream()
+  yield User.where() // mquery
+})()
+```
 
-// yieldable document actions
+`yieldb` makes working with [mongodb](https://www.mongodb.org/) and
+[co](https://github.com/visionmedia/co/)/[koa](http://koajs.com/) a breeze.
 
-  - $set
-  - $unset
-  - $inc
-  - $rename
-  - $push
-  - $pushAll
-  - $pull
-  - $pullAll
-  - $pop
-  - $shift
-  - $addToSet
-  - $reload
-  - $save (like $thunk)
+### connect
 
-/// nice to have
-// alter the mongodb driver to accept a stub object for
-// deserializing bson into our model instance (speed nerd)
+Connecting to mongodb is easy.
+
+```js
+var co = require('co');
+var connect = require('yieldb').connect;
+
+co(function*(){
+  var db = yield connect(mongodbUri [, options]);
+})()
+```
+
+Replica-sets, sharding and all the features available through the
+[mongodb driver](http://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html)
+are supported out of the box.
+
+### collections
+
+`yieldb` Collections provide a simple, constistent interface to work with mongodb collections.
+Call `db.col(collectionName)` to get a collection.
+
+```js
+var co = require('co');
+var connect = require('yieldb').connect;
+
+co(function*(){
+  var db = yield connect(mongodbUri [, options]);
+
+  // get a collection
+  var User = db.col('users');
+
+  // look up a user
+  var doc = yield User.findOne(id);
+})()
+```
+
+Key features:
+
+#### yieldable
+
+Each collection method returns a yieldable. For example:
 
 ```
-var comongo = require('comongo');
-
-// return an object which wraps the native db and delegates properties/methods
-var db = yield comongo.connect(uri);
-
-// add a custom model method
-var User = db.model('users')
-
-User.find(id)
-User.findOne(id)
-User.remove(id)
-User.update(id, { $set: .. })
-User.insert(docs)
-User.findAndModify(id, modifier)
-User.remove(id)
-User.aggregate()
-User.search('test search')
-
-// TODO how to stream find, aggregate, and search results??
-
-var aaron = User.new(obj)
-aaron.$set(key, val)
-aaron.$push(key, vals)
-yield aaron.$save()
-
-var exists = User.init(obj)
-exists.$addToSet(key, vals)
-yield exists.$save()
-
-////
-
-var db = yield comongo.connect(url);
-
-// auto fetch collections? no. some collection names may collide. avoid it. allow user to do whatever
-
 var User = db.col('users');
 
-User.find(id)
-User.find(id).stream()
-User.findOne(id)
-User.remove(id)
-User.update(id, { $set: .. })
-User.insert(docs)
-User.findAndModify(id, modifier)
-User.remove(id)
-User.aggregate()
-User.aggregate().stream()
-User.search('test search')
-User.where() // mquery
+yield User.insert({ name: 'yieldb' });
+var doc = yield User.find({ name: 'yieldb' });
+```
 
-this.db.User.find(id)
-this.db.users().findById(id)
+#### _id casting
 
-updates: how can we support modifying doc in memory and writing to db?
-for now, skip it. not essential. nice to add through an option later
+Any collection method which accepts selector arguments will benefit from
+auto-casting `_id` hexStrings to `ObjectId`. For example:
 
-var doc = User.findOne(id);
-yield User.update(query, modifier, options);
-yield User.update(query, modifier, { doc: doc });
-yield User.update(doc, query, modifier, options);
+```js
+var User = db.col('users');
+var ObjectId = require('mongodb').ObjectID;
 
+// the following are equivalent
+var doc = yield User.findOne('541b432d84dd6253074aabe6');
+var doc = yield User.findOne({ _id: '541b432d84dd6253074aabe6' });
+var doc = yield User.findOne({ _id: new ObjectId('541b432d84dd6253074aabe6') });
+```
+
+#### query building
+
+Most collection methods return an instance of [mquery](https://github.com/aheckmann/mquery).
+This means you can use all the query builder helper methods in mquery.
+
+```js
+var User = db.col('users');
+var docs = yield User.find({ role: 'developer' })
+                     .limit(10)
+                     .sort({ name: 'desc' })
+                     .read('primaryPreferred');
+```
+
+_The two methods which do not return `mquery` are `insert()`, which wouldn't
+make much sense, and `aggregrate()` which we aim to support in the future
+(Pull Request welcome)._
+
+#### promises
+
+Since most collection methods return an `mquery` instance, we get `Promise` support
+for free. Call the query builders `then()` method to receive a
+[bluebird](https://github.com/petkaantonov/bluebird) `Promise`.
+
+```js
+db.col('stats').where({ count: { $gt: 100 }})
+               .then(JSON.stringify)
+               .then(respond)
+               .catch(handleError)
+```
+
+### collection methods
+
+#### find
+
+Returns a yieldable mquery instance.
+
+#### findOne
+
+Returns a yieldable mquery instance.
+
+#### insert
+
+Returns a yieldable thunk.
+
+#### update
+
+Returns a yieldable mquery instance.
+
+#### remove
+
+Returns a yieldable mquery instance.
+
+#### aggregate
+
+Accepts an array of pipeline operations and returns a yieldable thunk.
+
+```
+yield db.col('watches').aggregate(pipeline);
+```
+
+The thunk also has it's own `stream()` method if that's what you're after.
+
+```
+yield db.col('watches').aggregate(pipeline).stream();
+```
+
+#### findOneAndUpdate
+
+Returns a yieldable mquery instance.
+
+#### findOneAndRemove
+
+Returns a yieldable mquery instance.
+
+#### count
+
+Returns a yieldable mquery instance.
+
+#### where
+
+Returns a yieldable mquery instance.

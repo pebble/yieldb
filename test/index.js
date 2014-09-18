@@ -1,4 +1,5 @@
 
+var mquery = require('mquery');
 var assert = require('assert');
 var m = require('../');
 
@@ -11,41 +12,28 @@ if (!('string' == typeof uri && uri.length)) {
   throw new Error('Missing COMONGO_TEST_URI environment variable');
 }
 
-describe('comongo', function() {
+describe('yieldb', function() {
   describe('exposes', function() {
     it('Db', function(done) {
       assert.equal('function', typeof m.Db);
       done();
     });
 
-    it('Model', function(done) {
-      assert.equal('function', typeof m.Model);
-      done();
-    });
-
-    it('Document', function(done) {
-      assert.equal('function', typeof m.Document);
+    it('Collection', function(done) {
+      assert.equal('function', typeof m.Collection);
       done();
     });
   });
 
   describe('connect()', function() {
-    it('is a function', function(done) {
-      assert.equal('function', typeof m.connect);
+    it('is a GeneratorFunction', function(done) {
+      assert.equal('GeneratorFunction', m.connect.constructor.name);
       done();
     });
 
-    it('returns a function', function(done) {
-      assert.equal('function', typeof m.connect());
-      done();
-    });
-
-    it('connects to mongodb when the returned fn is run', function(done) {
-      m.connect(uri)(function(err, db) {
-        if (err) return done(err);
-        assert(db);
-        done();
-      });
+    it('connects to mongodb when yielded', function*() {
+      var db = yield m.connect(uri);
+      assert(db);
     });
   });
 
@@ -53,22 +41,22 @@ describe('comongo', function() {
     describe('close()', function() {
       it('returns a thunk', function*() {
         var db = yield m.connect(uri);
-        yield db.close();
+        assert('function', typeof db.close());
       });
     });
 
-    describe('model()', function() {
-      it('returns a model', function*() {
+    describe('col()', function() {
+      it('returns a Collection', function*() {
         var db = yield m.connect(uri);
         var name = 'users';
-        var User = db.model(name);
-        assert(User instanceof m.Model);
+        var User = db.col(name);
+        assert(User instanceof m.Collection);
         assert.equal(name, User.name);
       });
     });
   });
 
-  describe('Model', function() {
+  describe('Collection', function() {
     var db;
     var User;
     var name = 'users';
@@ -77,18 +65,22 @@ describe('comongo', function() {
 
     before(function*() {
       db = yield m.connect(uri);
-      User = db.model(name);
+      User = db.col(name);
+
+      // use underlying driver for creation
+
       lastOfUs = (yield function(cb) {
-        User.$col.insert({ name: 'Last Of Us' }, cb);
+        User.col.insert({ name: 'Last Of Us' }, cb);
       })[0];
+
       zelda = (yield function(cb) {
-        User.$col.insert({ name: 'Zelda' }, cb);
+        User.col.insert({ name: 'Zelda' }, cb);
       })[0];
     });
 
     after(function*() {
       yield function(cb) {
-        User.$col.drop(cb);
+        User.col.drop(cb);
       }
     });
 
@@ -97,64 +89,11 @@ describe('comongo', function() {
       done();
     });
 
-    describe('.new()', function() {
-      it('returns a Document', function(done) {
-        assert(User.new({ name: 'co' }) instanceof m.Document);
-        done();
-      });
-
-      it('creates an object with matching values', function(done) {
-        var joe = User.new({
-          name: 'Joe'
-        , parent: true
-        , nested: { thing: ['cookies'] }
-        });
-
-        assert.equal(joe.name, 'Joe');
-        assert(joe.parent);
-        assert.equal(joe.nested.thing[0], 'cookies');
-
-        done();
-      });
-
-      it('sets .isNew to true', function(done) {
-        assert(User.new({ x: 1 }).isNew);
-        done();
-      });
-    });
-
-    describe('.init()', function() {
-      it('returns a Document', function(done) {
-        assert(User.init({ name: 'co' }) instanceof m.Document);
-        done();
-      });
-
-      it('creates an object with matching values', function(done) {
-        var joe = User.init({
-          name: 'Joe'
-        , parent: true
-        , nested: { thing: ['cookies'] }
-        });
-
-        assert.equal(joe.name, 'Joe');
-        assert(joe.parent);
-        assert.equal(joe.nested.thing[0], 'cookies');
-
-        done();
-      });
-
-      it('sets .isNew to false', function(done) {
-        assert(!User.init({ x: 1 }).isNew);
-        done();
-      });
-    });
-
     describe('#find()', function() {
 
-      // TODO return promise instead
-      it('returns a thunk', function(done) {
-        var fn = User.find();
-        assert.equal('function', typeof fn);
+      it('returns an mquery', function(done) {
+        var query = User.find();
+        assert(query instanceof mquery);
         done();
       });
 
@@ -162,7 +101,6 @@ describe('comongo', function() {
         var arr = yield User.find();
         assert(Array.isArray(arr));
         assert.equal(2, arr.length);
-        assert(arr[0] instanceof m.Document);
       });
 
       it('does not throw an error when no doc is found', function*() {
@@ -182,7 +120,7 @@ describe('comongo', function() {
       });
 
       it('accepts options', function*() {
-        var arr = yield User.find({}, { fields: { _id: 0 }});
+        var arr = yield User.find({}, { select: { _id: 0 }});
         assert.equal(2, arr.length);
         arr.forEach(function(doc) {
           assert(doc.name);
@@ -213,7 +151,6 @@ describe('comongo', function() {
           var stream = User.find().stream();
 
           stream.on('data', function(doc) {
-            assert(doc instanceof m.Document);
             docs.push(doc);
           })
 
@@ -231,9 +168,9 @@ describe('comongo', function() {
     });
 
     describe('#findOne()', function() {
-      it('returns a thunk', function(done) {
-        var fn = User.findOne();
-        assert.equal('function', typeof fn);
+      it('returns an mquery', function(done) {
+        var query = User.findOne();
+        assert(query instanceof mquery);
         done();
       });
 
@@ -243,7 +180,6 @@ describe('comongo', function() {
         assert(!Array.isArray(doc));
         assert(Object.keys(doc).length);
         assert(doc._id);
-        assert(doc instanceof m.Document);
       });
 
       it('does not throw an error when no doc is found', function*() {
@@ -262,7 +198,7 @@ describe('comongo', function() {
       });
 
       it('accepts options', function*() {
-        var arr = yield User.find({}, { fields: { _id: 0 }});
+        var arr = yield User.find({}, { select: '-_id' });
         assert.equal(2, arr.length);
         arr.forEach(function(doc) {
           assert(doc.name);
@@ -410,9 +346,9 @@ describe('comongo', function() {
     });
 
     describe('#update()', function() {
-      it('returns a thunk', function(done) {
-        var fn = User.update({}, {});
-        assert.equal('function', typeof fn);
+      it('returns an mquery', function(done) {
+        var query = User.update({}, {});
+        assert(query instanceof mquery);
         done();
       });
 
@@ -499,9 +435,9 @@ describe('comongo', function() {
     });
 
     describe('#remove()', function() {
-      it('returns a thunk', function(done) {
-        var fn = User.remove({_id: '#remove' });
-        assert.equal('function', typeof fn);
+      it('returns an mquery', function(done) {
+        var query = User.remove({_id: '#remove' });
+        assert(query instanceof mquery);
         done();
       });
 
@@ -549,8 +485,8 @@ describe('comongo', function() {
             var name = '#remove fullResult override';
             var docs = [{ n: name }, { n: name }];
             yield User.insert(docs);
-            var arr = yield User.remove({ n: name }, { fullResult: false });
-            assert.equal(2, arr[0]);
+            var res = yield User.remove({ n: name }, { fullResult: false });
+            assert.equal(2, res);
           });
         });
       });
@@ -676,75 +612,59 @@ describe('comongo', function() {
       });
     });
 
-    describe('#findAndModify()', function() {
+    describe('#findOneAndUpdate()', function() {
       var inserted = [
-        { findAndModify: true }
-      , { findAndModify: true }
+        { findOneAndUpdate: true }
+      , { findOneAndUpdate: true }
       ];
 
       before(function*() {
         yield User.insert(inserted);
       });
 
-      it('returns a thunk', function(done) {
-        var fn = User.findAndModify({}, {});
-        assert.equal('function', typeof fn);
+      it('returns an mquery', function(done) {
+        var query = User.findOneAndUpdate({}, {});
+        assert(query instanceof mquery);
         done();
       });
 
       it('responds with a single doc', function*() {
-        var doc = yield User.findAndModify({ findAndModify: true }, { $set: { color: 'green' }});
+        var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true }, { $set: { color: 'green' }});
         assert(doc);
         assert.equal('green', doc.color);
       });
 
       it('does not throw an error when no doc is found', function*() {
-        var doc = yield User.findAndModify({ findAndModify: true, asdf: '3hfa' }, { $set: { color: 'green' }});
+        var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true, asdf: '3hfa' }, { $set: { color: 'green' }});
         assert.equal(null, doc);
       });
 
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
           var id = String(lastOfUs._id);
-          var doc= yield User.findAndModify(id, { $set: { findAndModified: 5 }});
+          var doc= yield User.findOneAndUpdate(id, { $set: { findAndModified: 5 }});
           assert(doc);
           assert.equal('Last Of Us', doc.name);
         });
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var id = String(lastOfUs._id);
-          var doc= yield User.findAndModify({ _id: id }, { $unset: { findAndModified: true }});
+          var doc= yield User.findOneAndUpdate({ _id: id }, { $unset: { findAndModified: true }});
           assert(doc);
           assert.equal('Last Of Us', doc.name);
         });
       });
 
       describe('arguments', function() {
-        describe('selector', function() {
-          it('is required', function*() {
-            assert.throws(function() {
-              User.findAndModify();
-            }, /missing selector/);
-          });
-        });
-
-        describe('update command', function() {
-          it('is required', function*() {
-            assert.throws(function() {
-              User.findAndModify({});
-            }, /missing update argument/);
-          });
-        });
-
         describe('options', function() {
           describe('new', function() {
             it('defaults to true', function*() {
-              var doc = yield User.findAndModify({ findAndModify: true }, { $set: { color: 'blue' }});
+              var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true }, { $set: { color: 'blue' }});
               assert(doc);
               assert.equal('blue', doc.color);
             });
             it('can be overridden', function*() {
-              var doc = yield User.findAndModify({ findAndModify: true }, { $set: { color: 'red' }}, { new: false });
+              var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true }, { $set: { color: 'red' }}, { new: false });
               assert(doc);
               assert('red' !== doc.color);
             });
@@ -753,42 +673,90 @@ describe('comongo', function() {
       });
     });
 
+    describe('#findOneAndRemove()', function() {
+      var inserted = [
+        { findOneAndRemove: true }
+      , { findOneAndRemove: true }
+      ];
+
+      before(function*() {
+        yield User.insert(inserted);
+      });
+
+      it('returns an mquery', function(done) {
+        var query = User.findOneAndRemove({}, {});
+        assert(query instanceof mquery);
+        done();
+      });
+
+      it('responds with a single doc', function*() {
+        var doc = yield User.findOneAndRemove({ findOneAndRemove: true });
+        assert(doc);
+        var remaining = yield User.count({ findOneAndRemove: true });
+        assert.equal(1, remaining);
+      });
+
+      it('does not throw an error when no doc is found', function*() {
+        var doc = yield User.findOneAndRemove({ findOneAndRemove: true, asdf: '3hfa' });
+        assert.equal(null, doc);
+      });
+
+      describe('casts', function() {
+        it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
+          var id = String(lastOfUs._id);
+          var doc= yield User.findOneAndRemove(id);
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
+          yield User.insert(doc);
+        });
+
+        it('hexstring _id to ObjectId(hexstring)', function*() {
+          var id = String(lastOfUs._id);
+          var doc= yield User.findOneAndRemove({ _id: id });
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
+          yield User.insert(doc);
+        });
+      });
+    });
+
     describe('#count', function() {
-      it('returns a thunk', function(done) {
-        var fn = User.count();
-        assert.equal('function', typeof fn);
+      it('returns an mquery', function(done) {
+        var query = User.count();
+        assert(query instanceof mquery);
         done();
       });
 
       it('responds with a number', function*() {
         yield User.insert([{ counter: 'fun' }, { counter: 'stuff' }]);
         var count = yield User.count({ counter: { $exists: true }});
-        assert(2 === count);
+        assert.equal(2, count);
       });
 
       it('accepts a selector', function*() {
         var count = yield User.count({ counter: 'stuff' });
-        assert(1 === count);
+        assert.strictEqual(1, count);
       });
 
       it('accepts options', function*() {
         var count = yield User.count({}, { skip: 100 });
-        assert(0 === count);
+        assert.strictEqual(0, count);
       });
 
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
           var count = yield User.count(String(lastOfUs._id));
-          assert(1 === count);
+          assert.strictEqual(1, count);
         });
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var count = yield User.count({ _id: String(lastOfUs._id) });
-          assert(1 === count);
+          assert.strictEqual(1, count);
         });
       });
     });
 
+    /*
     describe('#distinct', function() {
       // casting
 
@@ -805,27 +773,6 @@ describe('comongo', function() {
       // casting
 
     });
+    */
   });
-
-
-
-  describe('Document', function() {
-    // isNew
-    // $set
-    // $unset
-    // $inc
-    // $rename
-    // $push
-    // $pushAll
-    // $pull
-    // $pullAll
-    // $pop
-    // $addToSet
-    // $reload
-    // toJSON
-    // $isDirty
-    // $become
-    // $save
-  });
-
 });
