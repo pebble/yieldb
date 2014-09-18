@@ -174,3 +174,34 @@ Returns a yieldable mquery instance.
 #### where
 
 Returns a yieldable mquery instance.
+
+### Installation
+
+```
+npm install yieldb --save
+```
+
+### Development
+
+#### running tests
+
+- `make test` runs tests
+- `make test-cov` runs tests + test coverage
+- `make open-cov` opens test coverage results in your browser
+
+#### verbose logging
+
+`yieldb` supports the `debug` module for help during development.
+Enable verbose logging by setting your `DEBUG` env variable like so:
+
+````
+DEBUG=yieldb* npm test
+```
+
+## Sponsored by
+
+[Pebble Technology!](https://getpebble.com)
+
+## License
+
+[MIT](https://github.com/pebble/yieldb/blob/master/LICENSE)
