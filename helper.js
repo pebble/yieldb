@@ -1,5 +1,5 @@
 
-var debug = require('debug')('yield:helper');
+var debug = require('debug')('yield:inputhelper');
 var isObject = require('is-object');
 var hasOwn = require('has-own');
 var ObjectId = require('mongodb').ObjectID;
