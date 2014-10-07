@@ -23,6 +23,11 @@ describe('yieldb', function() {
       assert.equal('function', typeof m.Collection);
       done();
     });
+
+    it('mongodb', function(done) {
+      assert(m.mongodb);
+      done();
+    });
   });
 
   describe('connect()', function() {
