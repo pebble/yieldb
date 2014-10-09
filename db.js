@@ -49,6 +49,21 @@ Db.prototype.close = function() {
 }
 
 /**
+ * Returns a thunk which when executed
+ * deletes the _entire_ database.
+ *
+ *     yield db.drop();
+ *
+ * @returns {Function} thunk
+ * @api public
+ */
+
+Db.prototype.drop = function() {
+  debug('drop()');
+  return this.db.dropDatabase.bind(this.db);
+}
+
+/**
  * Returns a thunk which when executed responds
  * with an array of all collection objects, one
  * for each collection in the database, OR an

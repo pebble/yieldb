@@ -59,6 +59,27 @@ describe('yieldb', function() {
         assert.equal(name, User.name);
       });
     });
+
+    describe('drop', function() {
+      it('returns a thunk', function*() {
+        var db = yield m.connect(uri);
+        assert('function', typeof db.drop());
+      });
+
+      it('deletes all database contents', function*() {
+        var db = yield m.connect(uri);
+
+        var X = db.col('x');
+        var Y = db.col('y');
+
+        yield [ X.insert({ pebble: true }), Y.insert({ pebble: true }) ];
+        yield db.drop();
+
+        var count = yield [ X.count(), Y.count() ];
+        assert.strictEqual(0, count[0] + count[1]);
+      });
+
+    });
   });
 
   describe('Collection', function() {
