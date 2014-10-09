@@ -85,6 +85,7 @@ describe('yieldb', function() {
   describe('Collection', function() {
     var db;
     var User;
+    var Dropper;
     var name = 'users';
     var lastOfUs;
     var zelda;
@@ -92,6 +93,7 @@ describe('yieldb', function() {
     before(function*() {
       db = yield m.connect(uri);
       User = db.col(name);
+      Dropper = db.col('droppers');
 
       // use underlying driver for creation
 
@@ -746,7 +748,7 @@ describe('yieldb', function() {
       });
     });
 
-    describe('#count', function() {
+    describe('#count()', function() {
       it('returns an mquery', function(done) {
         var query = User.count();
         assert(query instanceof mquery);
@@ -779,6 +781,20 @@ describe('yieldb', function() {
           var count = yield User.count({ _id: String(lastOfUs._id) });
           assert.strictEqual(1, count);
         });
+      });
+    });
+
+    describe('#drop()', function() {
+      it('returns a thunk', function*() {
+        var fn = Dropper.drop({});
+        assert.equal('function', typeof fn);
+      });
+
+      it('deletes all collection contents', function*() {
+        yield Dropper.insert({ hi: 'there' });
+        assert.strictEqual(1, yield Dropper.count());
+        yield Dropper.drop();
+        assert.strictEqual(0, yield Dropper.count());
       });
     });
 

@@ -165,6 +165,23 @@ Collection.prototype.remove = function(selector, opts) {
 }
 
 /**
+ * Returns thunk which when executed deletes
+ * the entire collection.
+ *
+ *     yield User.drop();
+ *
+ * @returns {Function} thunk
+ */
+
+Collection.prototype.drop = function() {
+  var self = this;
+  return function drop(cb) {
+    debug('%s.drop()', self.name);
+    self.col.drop(cb);
+  }
+}
+
+/**
  * Returns a thunk which when executed performs an
  * aggregation query.
  *
