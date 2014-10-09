@@ -11,15 +11,16 @@ co(function*(){
 
   var User = db.col('users');
 
-  yield User.find(id)
+  yield User.find(id)     // mquery
   yield User.find(id).stream()
-  yield User.findOne(id)
-  yield User.remove(id)
-  yield User.update(id, { $set: .. })
-  yield User.insert(docs)
-  yield User.findAndModify(id, modifier)
-  yield User.remove(id)
-  yield User.aggregate() // thunk
+  yield User.findOne(id)  // mquery
+  yield User.remove(id)   // mquery
+  yield User.update(id, { $set: .. })    // mquery
+  yield User.findAndModify(id, modifier) // mquery
+  yield User.remove(id)   // mquery
+  yield User.insert(docs) // thunk
+  yield User.drop()       // thunk
+  yield User.aggregate()  // thunk
   yield User.aggregate().stream()
   yield User.where() // mquery
 })()
@@ -106,7 +107,7 @@ var docs = yield User.find({ role: 'developer' })
                      .read('primaryPreferred');
 ```
 
-_The two methods which do not return `mquery` are `insert()`, which wouldn't
+_The methods which do not return `mquery` are `insert()` and `drop()`, which wouldn't
 make much sense, and `aggregrate()` which we aim to support in the future
 (Pull Request welcome)._
 
@@ -144,6 +145,10 @@ Returns a yieldable mquery instance.
 #### remove
 
 Returns a yieldable mquery instance.
+
+#### drop
+
+Returns a yieldable thunk.
 
 #### aggregate
 
