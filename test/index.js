@@ -7,9 +7,9 @@ var m = require('../');
 require('co-mocha');
 
 // default test database
-var uri = process.env.COMONGO_TEST_URI;
+var uri = process.env.YIELDB_TEST_URI;
 if (!('string' == typeof uri && uri.length)) {
-  throw new Error('Missing COMONGO_TEST_URI environment variable');
+  throw new Error('Missing YIELDB_TEST_URI environment variable');
 }
 
 describe('yieldb', function() {
