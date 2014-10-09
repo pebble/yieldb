@@ -39,6 +39,8 @@ Db.init = function*(database) {
  * Returns a thunk which when executed
  * closes the database connection.
  *
+ *     yield db.close();
+ *
  * @returns {Function} thunk
  * @api public
  */
