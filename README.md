@@ -193,6 +193,28 @@ yield db.col('watches').distinct(key [, query]);
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').where(selector).select('name email')
+```
+
+#### index
+
+Creates an index.
+Returns a yieldable thunk.
+
+```
+yield db.col('watches').index(indexDefinition, options);
+```
+
+#### indexes
+
+Retreives an array of all defined indexes for this collection.
+Returns a yieldable thunk.
+
+```
+var indexes = yield db.col('watches').indexes();
+```
+
 ### Installation
 
 ```

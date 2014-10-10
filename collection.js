@@ -320,6 +320,49 @@ Collection.prototype.where = function(arg) {
   return this.query().where(arg);
 }
 
+/**
+ * Create an index
+ *
+ *     var User = db.col('users');
+ *     yield User.index({ name: 1, email: -1 });
+ *
+ * @param {Object} indexDefinition
+ * @param {Object} [options]
+ * @returns {Function} thunk
+ */
+
+Collection.prototype.index = function(def, opts) {
+  if (!def) throw new TypeError('missing index definition');
+
+  opts || (opts = {});
+  var self = this;
+
+  return function index(cb) {
+    debug('%s.index(%j, %j)', self.name, def, opts);
+    self.col.ensureIndex(def, opts, cb);
+  }
+}
+
+/**
+ * Retreives all indexes for the given collection
+ *
+ *     var User = db.col('users');
+ *     var indexes = yield User.indexes();
+ *
+ * @returns {Function} thunk
+ */
+
+Collection.prototype.indexes = function(opts) {
+  opts || (opts = {});
+  if (!hasOwn('full', opts)) opts.full = true;
+
+  var self = this;
+  return function indexes(cb) {
+    debug('%s.indexes(%j)', self.name, opts);
+    self.col.indexInformation(opts, cb);
+  }
+}
+
 // TODO
 // mapReduce
 // geoNear

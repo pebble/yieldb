@@ -42,46 +42,6 @@ describe('yieldb', function() {
     });
   });
 
-  describe('Db', function() {
-    describe('close()', function() {
-      it('returns a thunk', function*() {
-        var db = yield m.connect(uri);
-        assert('function', typeof db.close());
-      });
-    });
-
-    describe('col()', function() {
-      it('returns a Collection', function*() {
-        var db = yield m.connect(uri);
-        var name = 'users';
-        var User = db.col(name);
-        assert(User instanceof m.Collection);
-        assert.equal(name, User.name);
-      });
-    });
-
-    describe('drop', function() {
-      it('returns a thunk', function*() {
-        var db = yield m.connect(uri);
-        assert('function', typeof db.drop());
-      });
-
-      it('deletes all database contents', function*() {
-        var db = yield m.connect(uri);
-
-        var X = db.col('x');
-        var Y = db.col('y');
-
-        yield [ X.insert({ pebble: true }), Y.insert({ pebble: true }) ];
-        yield db.drop();
-
-        var count = yield [ X.count(), Y.count() ];
-        assert.strictEqual(0, count[0] + count[1]);
-      });
-
-    });
-  });
-
   describe('Collection', function() {
     var db;
     var User;
@@ -798,7 +758,7 @@ describe('yieldb', function() {
       });
     });
 
-    describe('#distinct', function() {
+    describe('#distinct()', function() {
       var doc1 = { distinct: 'pebble' };
       var doc2 = { distinct: 'steel', m: true };
 
@@ -847,6 +807,60 @@ describe('yieldb', function() {
         });
       });
     });
+
+    describe('#indexes()', function() {
+      it('returns a thunk', function*() {
+        var fn = User.indexes();
+        assert.equal('function', typeof fn);
+      });
+
+      it('responds with an array', function*() {
+        var info = yield User.indexes();
+        assert(Array.isArray(info));
+        assert.equal(1, info.length);
+      });
+
+      it('accepts options', function*() {
+        var info = yield User.indexes({ full: false });
+        assert('object' == typeof info && null != info);
+        assert('_id_' in info);
+      });
+    });
+
+    describe('#index()', function() {
+      it('returns a thunk', function(done) {
+        var fn = User.index({ name: 1 });
+        assert.equal('function', typeof fn);
+        done();
+      });
+
+      it('requires an index definition', function(done) {
+        assert.throws(function() {
+          User.index();
+        }, /missing/);
+        done();
+      });
+
+      it('accepts options', function*() {
+        var name = 'asdfjak3ld';
+
+        var def = {};
+        def[name] = 1;
+
+        var res = yield User.index(def, { sparse: true });
+        var info = yield User.indexes();
+
+        var indexName = name + '_1';
+
+        var exists = info.some(function(index) {
+          return index.name == indexName && !! index.sparse
+        });
+
+        assert(exists);
+      });
+    });
+
+    /*
     describe('#mapReduce', function() {
       // casting
 
@@ -861,4 +875,45 @@ describe('yieldb', function() {
     });
     */
   });
+
+  describe('Db', function() {
+    describe('close()', function() {
+      it('returns a thunk', function*() {
+        var db = yield m.connect(uri);
+        assert('function', typeof db.close());
+      });
+    });
+
+    describe('col()', function() {
+      it('returns a Collection', function*() {
+        var db = yield m.connect(uri);
+        var name = 'users';
+        var User = db.col(name);
+        assert(User instanceof m.Collection);
+        assert.equal(name, User.name);
+      });
+    });
+
+    describe('drop', function() {
+      it('returns a thunk', function*() {
+        var db = yield m.connect(uri);
+        assert('function', typeof db.drop());
+      });
+
+      it('deletes all database contents', function*() {
+        var db = yield m.connect(uri);
+
+        var X = db.col('x');
+        var Y = db.col('y');
+
+        yield [ X.insert({ pebble: true }), Y.insert({ pebble: true }) ];
+        yield db.drop();
+
+        var count = yield [ X.count(), Y.count() ];
+        assert.strictEqual(0, count[0] + count[1]);
+      });
+
+    });
+  });
+
 });
