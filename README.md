@@ -2,6 +2,10 @@
 
 Simple, expressive and yieldable MongoDB.
 
+[![Build Status](https://magnum.travis-ci.com/pebble/yieldb.svg?token=2fGKDUnr1Num4uYLzNYp&branch=master)](https://magnum.travis-ci.com/pebble/yieldb)
+[![Coverage Status](https://img.shields.io/coveralls/pebble/yieldb.svg)](https://coveralls.io/r/pebble/yieldb)
+[![npm](http://img.shields.io/npm/v/yieldb.svg)](https://www.npmjs.org/package/yieldb)
+
 ```js
 var co = require('co');
 var connect = require('yieldb').connect;
