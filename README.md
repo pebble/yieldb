@@ -11,18 +11,24 @@ co(function*(){
 
   var User = db.col('users');
 
-  yield User.find(id)     // mquery
-  yield User.find(id).stream()
-  yield User.findOne(id)  // mquery
-  yield User.remove(id)   // mquery
+  yield User.findOne(id)    // mquery
+  yield User.remove(id)     // mquery
   yield User.update(id, { $set: .. })    // mquery
   yield User.findAndModify(id, modifier) // mquery
-  yield User.remove(id)   // mquery
-  yield User.insert(docs) // thunk
-  yield User.drop()       // thunk
-  yield User.aggregate()  // thunk
+  yield User.remove(id)     // mquery
+  yield User.where()        // mquery
+  yield User.distinct(key)  // mquery
+
+  yield User.find(id)       // mquery
+  yield User.find(id).stream()
+
+  yield User.insert(docs)   // thunk
+  yield User.drop()         // thunk
+  yield User.aggregate()    // thunk
   yield User.aggregate().stream()
-  yield User.where() // mquery
+
+  yield User.index()        // thunk
+  yield User.indexes()      // thunk
 })()
 ```
 
@@ -96,7 +102,7 @@ var doc = yield User.findOne({ _id: new ObjectId('541b432d84dd6253074aabe6') });
 
 #### query building
 
-Most collection methods return an instance of [mquery](https://github.com/aheckmann/mquery).
+Where it makes sense, collection methods return an instance of [mquery](https://github.com/aheckmann/mquery).
 This means you can use all the query builder helper methods in mquery.
 
 ```js
@@ -130,25 +136,52 @@ db.col('stats').where({ count: { $gt: 100 }})
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').find(selector, options);
+```
+
 #### findOne
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').findOne(selector, options);
+```
+
 #### insert
 
+Accepts either a single object or array of objects.
+Objects which do not have an `_id` will receive one assigned a new `ObjectId`.
 Returns a yieldable thunk.
+
+```
+yield db.col('watches').insert(obj, options);
+yield db.col('watches').insert([obj1, obj2, ..], options);
+```
 
 #### update
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').update(selector, update, options);
+```
+
 #### remove
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').remove(selector, options);
+```
+
 #### drop
 
 Returns a yieldable thunk.
+
+```
+yield db.col('watches').drop();
+```
 
 #### aggregate
 
@@ -168,9 +201,17 @@ yield db.col('watches').aggregate(pipeline).stream();
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').findOneAndUpdate(selector, update, options)
+```
+
 #### findOneAndRemove
 
 Returns a yieldable mquery instance.
+
+```
+yield db.col('watches').findOneAndRemove(selector, options)
+```
 
 #### count
 

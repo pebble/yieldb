@@ -271,10 +271,10 @@ Collection.prototype.findOneAndRemove = function(selector, opts) {
  *
  * @param {Object|ObjectId|hexString} selector
  * @param {Object} [opts]
- * @returns {Function} thunk
+ * @returns {Object} mquery
  */
 
-Collection.prototype.count = function (selector, opts) {
+Collection.prototype.count = function(selector, opts) {
   var matcher = cast(selector);
   var mq = this.query().count(matcher);
   mq.setOptions(opts);
