@@ -86,20 +86,21 @@ Db.prototype.col = Db.prototype.collection = function(name) {
 }
 
 /**
- * For monitoring health
+ * Sends a ping to mongodb
  *
  * Example:
  *
- *     var stats = yield db.stats();
+ *     var stats = yield db.ping();
  *
  * @returns {Function} thunk
  * @throws {Error} if the mongodb driver responds with an Error
  */
 
-Db.prototype.stats = function() {
-  debug('stats()');
-
-  return this.db.stats.bind(this.db);
+Db.prototype.ping = function() {
+  var db = this.db;
+  return function(cb) {
+    db.command({ ping: 1 }, cb);
+  }
 }
 
 /**
