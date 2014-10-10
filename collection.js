@@ -282,6 +282,30 @@ Collection.prototype.count = function (selector, opts) {
 }
 
 /**
+ * Returns a query which when executed performs a distinct command.
+ *
+ * @param {String} key
+ * @param {Object|ObjectId|hexString} [selector]
+ * @returns {Object} mquery
+ */
+
+Collection.prototype.distinct = function(key, selector) {
+  if ('string' != typeof key)
+    throw new TypeError('distinct expects a `key` string');
+
+  var mq = this.query();
+
+  if (selector) {
+    var matcher = cast(selector);
+    mq.distinct(matcher, key);
+  } else {
+    mq.distinct(key);
+  }
+
+  return mq;
+}
+
+/**
  * Returns an mquery builder for this collection passing
  * the arg to `mquery().where(arg)`.
  *
@@ -297,7 +321,6 @@ Collection.prototype.where = function(arg) {
 }
 
 // TODO
-// distinct
 // mapReduce
 // geoNear
 // geoSearch

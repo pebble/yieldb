@@ -798,10 +798,54 @@ describe('yieldb', function() {
       });
     });
 
-    /*
     describe('#distinct', function() {
-      // casting
+      var doc1 = { distinct: 'pebble' };
+      var doc2 = { distinct: 'steel', m: true };
 
+      before(function*() {
+        yield User.insert([doc1, doc2]);
+      });
+
+      it('returns an mquery', function(done) {
+        var query = User.distinct('key');
+        assert(query instanceof mquery);
+        done();
+      });
+
+      it('requires a key string', function() {
+        var tests = [{}, Math, Math.max, [], undefined, null, 3, /asdf/];
+
+        tests.forEach(function(test){
+          assert.throws(function(){
+            User.distinct(test);
+          });
+        });
+      });
+
+      it('responds with an array', function*() {
+        var distinct = yield User.distinct('distinct');
+        distinct.sort();
+
+        assert.deepEqual(['pebble', 'steel'], distinct);
+      });
+
+      it('accepts a selector', function*() {
+        var distinct = yield User.distinct('distinct', { m: true });
+        assert.strictEqual(1, distinct.length);
+        assert.equal('steel', distinct[0]);
+      });
+
+      describe('casts', function() {
+        it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
+          var distinct = yield User.distinct('distinct', String(doc1._id));
+          assert.equal('pebble', distinct[0]);
+        });
+
+        it('hexstring _id to ObjectId(hexstring)', function*() {
+          var distinct = yield User.distinct('distinct', { _id: String(doc1._id) });
+          assert.equal('pebble', distinct[0]);
+        });
+      });
     });
     describe('#mapReduce', function() {
       // casting

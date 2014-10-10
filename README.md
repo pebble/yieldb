@@ -176,6 +176,19 @@ Returns a yieldable mquery instance.
 
 Returns a yieldable mquery instance.
 
+```
+yield db.col('watches').count(selector, options)
+```
+
+#### distinct
+
+Returns a yieldable mquery instance.
+
+```
+yield db.col('watches').distinct(key [, query]);
+```
+
+
 #### where
 
 Returns a yieldable mquery instance.
