@@ -66,35 +66,6 @@ Db.prototype.drop = function() {
 }
 
 /**
- * Returns a thunk which when executed responds
- * with an array of all collection objects, one
- * for each collection in the database, OR an
- * error if one occurs.
- *
- *     var collections = yield db.getCollections();
- *
- * @returns {Function} thunk
- * @api public
- */
-
-Db.prototype.getCollections = function() {
-  debug('getCollections()');
-
-  var db;
-  return function(cb) {
-    db.collections(function(err, collections) {
-      if (err) return cb(err);
-
-      var cols = collections.map(function(collection) {
-        return db.collection(collection.collectionName);
-      });
-
-      cb(err, cols);
-    });
-  }
-}
-
-/**
  * Creates a new collection object for the given `name`.
  *
  *     var Trends = db.col('trends');
