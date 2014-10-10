@@ -900,26 +900,29 @@ describe('yieldb', function() {
   });
 
   describe('Db', function() {
+    var db;
+
+    before(function*() {
+      db = yield m.connect(uri);
+    });
+
     describe('close()', function() {
       it('returns a thunk', function*() {
-        var db = yield m.connect(uri);
         assert('function', typeof db.close());
       });
     });
 
     describe('col()', function() {
-      it('returns a Collection', function*() {
-        var db = yield m.connect(uri);
+      it('returns a collection', function*() {
         var name = 'users';
-        var User = db.col(name);
-        assert(User instanceof m.Collection);
-        assert.equal(name, User.name);
+        var user = db.col(name);
+        assert(user instanceof m.Collection);
+        assert.equal(name, user.name);
       });
     });
 
-    describe('drop', function() {
+    describe('drop()', function() {
       it('returns a thunk', function*() {
-        var db = yield m.connect(uri);
         assert('function', typeof db.drop());
       });
 
@@ -935,7 +938,28 @@ describe('yieldb', function() {
         var count = yield [ X.count(), Y.count() ];
         assert.strictEqual(0, count[0] + count[1]);
       });
+    });
 
+    describe('serverStatus()', function() {
+      it('returns a thunk', function*() {
+        assert('function', typeof db.serverStatus());
+      });
+
+      it('executes a serverStatus command', function*() {
+        var res = yield db.serverStatus();
+        assert(res.host);
+      });
+    });
+
+    describe('ping()', function() {
+      it('returns a thunk', function*() {
+        assert('function', typeof db.ping());
+      });
+
+      it('executes a ping command', function*() {
+        var res = yield db.ping();
+        assert.equal(1, res.ok);
+      });
     });
   });
 
