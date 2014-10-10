@@ -72,6 +72,20 @@ describe('yieldb', function() {
       }
     });
 
+    it('requires a collection name', function(done) {
+      assert.throws(function(){
+        db.col();
+      }, /must be a string/);
+      done();
+    });
+
+    it('returns the same collection object if called twice w same name', function(done) {
+      var c1 = db.col('asdf');
+      var c2 = db.col('asdf');
+      assert.strictEqual(c1, c2);
+      done();
+    });
+
     it('has a name', function(done) {
       assert.equal(name, User.name);
       done();
