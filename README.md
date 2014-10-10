@@ -11,24 +11,12 @@ co(function*(){
 
   var User = db.col('users');
 
+  yield User.insert(doc)    // thunk
   yield User.findOne(id)    // mquery
   yield User.remove(id)     // mquery
   yield User.update(id, { $set: .. })    // mquery
   yield User.findAndModify(id, modifier) // mquery
   yield User.remove(id)     // mquery
-  yield User.where()        // mquery
-  yield User.distinct(key)  // mquery
-
-  yield User.find(id)       // mquery
-  yield User.find(id).stream()
-
-  yield User.insert(docs)   // thunk
-  yield User.drop()         // thunk
-  yield User.aggregate()    // thunk
-  yield User.aggregate().stream()
-
-  yield User.index()        // thunk
-  yield User.indexes()      // thunk
 })()
 ```
 
