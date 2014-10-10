@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('yield:db');
+var debug = require('debug')('yieldb:db');
 var mongo = require('mongodb');
 var hasOwn = require('has-own');
 var mquery = require('mquery');
