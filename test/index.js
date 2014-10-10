@@ -255,6 +255,8 @@ describe('yieldb', function() {
 
         before(function*() {
           res = yield User.insert(original);
+          if (Array.isArray(res)) res = res[0];
+
           doc = yield User.findOne(original);
         });
 
@@ -301,6 +303,8 @@ describe('yieldb', function() {
           }
 
           res = yield User.insert(originals);
+          if (Array.isArray(res)) res = res[0];
+
           docs = yield User.find({ $or: originals });
         });
 
@@ -400,6 +404,7 @@ describe('yieldb', function() {
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
           var res = yield User.update(String(lastOfUs._id), { $set: { rating: 5 }});
+          if (Array.isArray(res)) res = res[0];
           assert.equal(1, res.n);
 
           var doc = yield User.findOne(lastOfUs._id);
@@ -417,6 +422,7 @@ describe('yieldb', function() {
         var selector = { _id: 'update returns the result of the op' };
         var res = yield User.update(selector, { $set: { x: 1 }});
         assert(res);
+        if (Array.isArray(res)) res = res[0];
         assert.equal(0, res.n);
         assert.equal(true, res.ok);
       });
@@ -465,6 +471,7 @@ describe('yieldb', function() {
             yield User.insert(docs);
             var res = yield User.remove({ n: name });
             assert(res);
+            if (Array.isArray(res)) res = res[0];
             assert.equal(true, res.ok);
             assert.equal(2, res.n);
           });
@@ -491,6 +498,7 @@ describe('yieldb', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
           var id = String(doc1._id);
           var res = yield User.remove(id);
+          if (Array.isArray(res)) res = res[0];
           assert.equal(1, res.n);
 
           var doc = yield User.findOne(id);
@@ -500,6 +508,7 @@ describe('yieldb', function() {
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var id = String(doc2._id);
           var res = yield User.remove({ _id: id });
+          if (Array.isArray(res)) res = res[0];
           assert.equal(1, res.n);
 
           var doc = yield User.findOne(id);
