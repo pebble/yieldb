@@ -1,6 +1,7 @@
 
 var mquery = require('mquery');
 var assert = require('assert');
+var helper = require('../helper');
 var m = require('../');
 
 // patch mocha to accept generators
@@ -76,6 +77,12 @@ describe('yieldb', function() {
       assert.throws(function(){
         db.col();
       }, /must be a string/);
+      done();
+    });
+
+    it('can be called without the `new` keyword', function(done) {
+      var c1 = m.Collection(db, 'asdf');
+      assert(c1 instanceof m.Collection);
       done();
     });
 
@@ -413,6 +420,28 @@ describe('yieldb', function() {
             assert.equal(1, updated);
           });
         });
+
+        describe('fullResult', function() {
+          var docs = [];
+          var count = 3;
+
+          before(function*() {
+            for (var i = 0; i < count; ++i) {
+              docs.push({ test: 'fullResult' });
+            }
+
+            yield User.insert(docs);
+          });
+
+          it('can be overridden', function*() {
+            var res = yield User.update(
+              { test: 'fullResult'}
+            , { $set: { x: 1 }}
+            , { fullResult: false }
+            );
+            assert.equal(3, res);
+          });
+        });
       });
 
       describe('casts', function() {
@@ -593,6 +622,33 @@ describe('yieldb', function() {
           var docs = [];
 
           var stream = User.aggregate([{ $match: { aggregate: true } }]).stream();
+          stream.on('readable', function() {
+            var doc;
+            while (null !== (doc = stream.read())) {
+              docs.push(doc);
+            }
+          });
+
+          stream.on('error', function(error) {
+            err = error;
+          });
+
+          stream.on('end', function() {
+            if (err) return done(err);
+            assert.equal(3, docs.length);
+            done();
+          })
+        });
+
+        it('accepts options', function(done) {
+          var err = null;
+          var docs = [];
+
+          var stream = User.aggregate(
+            [{ $match: { aggregate: true } }]
+          , { cursor: { batchSize: 4 }}
+          ).stream();
+
           stream.on('readable', function() {
             var doc;
             while (null !== (doc = stream.read())) {
@@ -883,6 +939,14 @@ describe('yieldb', function() {
       });
     });
 
+    describe('#where()', function() {
+      it('returns an mquery', function(done) {
+        var query = User.where('x');
+        assert(query instanceof mquery);
+        done();
+      });
+    });
+
     /*
     describe('#mapReduce', function() {
       // casting
@@ -959,6 +1023,26 @@ describe('yieldb', function() {
       it('executes a ping command', function*() {
         var res = yield db.ping();
         assert.equal(1, res.ok);
+      });
+    });
+  });
+
+  describe('helper.js', function() {
+    describe('cast', function() {
+      it('disallows non-hexstrings and object arguments', function(done) {
+        var tests = [
+          function(){}
+        , 3
+        , 'asdf'
+        ];
+
+        tests.forEach(function(test) {
+          assert.throws(function() {
+            helper.cast(test);
+          }, /invalid selector/);
+        })
+
+        done();
       });
     });
   });
