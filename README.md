@@ -122,6 +122,45 @@ db.col('stats').where({ count: { $gt: 100 }})
                .catch(handleError)
 ```
 
+### db methods
+
+#### col(name)
+
+Returns a `collection` instance
+
+```js
+var users = db.col('users');
+```
+
+#### close
+
+Returns a thunk which when executed closes the `db` connection.
+
+```js
+yield db.close();
+```
+
+#### drop
+Returns a thunk which when executed deletes the entire database.
+
+```js
+yield db.drop();
+```
+
+#### ping
+Returns a thunk which when executed sends a to database.
+
+```js
+yield db.ping();
+```
+
+#### serverStatus
+Returns a thunk which when executed responds with MongoDB status.
+
+```js
+yield db.serverStatus();
+```
+
 ### collection methods
 
 #### find
