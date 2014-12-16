@@ -3,7 +3,6 @@
 var debug = require('debug')('yieldb:db');
 var mongo = require('mongodb');
 var hasOwn = require('has-own');
-var mquery = require('mquery');
 var assert = require('assert');
 var Collection = require('./collection');
 

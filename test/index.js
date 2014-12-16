@@ -29,6 +29,11 @@ describe('yieldb', function() {
       assert(m.mongodb);
       done();
     });
+
+    it('mquery', function(done) {
+      assert(m.mquery);
+      done();
+    });
   });
 
   describe('connect()', function() {
@@ -43,7 +48,28 @@ describe('yieldb', function() {
     });
   });
 
-  describe('Collection', function() {
+  describe('Collection', function(){
+    describe('without overriding mquery.Promise', function() {
+      testCollections();
+    });
+
+    describe('with overriding mquery.Promise', function() {
+      var orig;
+
+      function before(){
+        orig = m.mquery.Promise;
+        m.mquery.Promise = Promise;
+      }
+
+      function after(){
+        m.mquery.Promise = orig;
+      }
+
+      testCollections(before, after);
+    });
+  });
+
+  function testCollections(bf, af) {
     var db;
     var User;
     var Dropper;
@@ -52,6 +78,8 @@ describe('yieldb', function() {
     var zelda;
 
     before(function*() {
+      if (bf) bf();
+
       db = yield m.connect(uri);
       User = db.col(name);
       Dropper = db.col('droppers');
@@ -68,6 +96,8 @@ describe('yieldb', function() {
     });
 
     after(function*() {
+      if (af) af();
+
       yield function(cb) {
         User.col.drop(cb);
       }
@@ -961,7 +991,7 @@ describe('yieldb', function() {
 
     });
     */
-  });
+  }
 
   describe('Db', function() {
     var db;

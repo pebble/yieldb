@@ -4,6 +4,7 @@ var mongo = mongodb.MongoClient;
 var debug = require('debug')('yieldb');
 var Db = require('./db');
 var Collection = require('./collection');
+var mquery = require('mquery');
 
 exports.connect = function*(uri, opts) {
   var nativeDb = yield connectToMongo(uri, opts);
@@ -16,6 +17,7 @@ exports.connect = function*(uri, opts) {
 exports.Db = Db;
 exports.Collection = Collection;
 exports.mongodb = mongodb;
+exports.mquery = mquery;
 
 /**
  * @api private
