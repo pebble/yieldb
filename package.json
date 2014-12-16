@@ -35,9 +35,9 @@
     "mquery": "1.2.0"
   },
   "devDependencies": {
-    "co": "^3.0.2",
+    "co": "^4.0.1",
     "istanbul-harmony": "^0.2.9",
-    "mocha": "^1.20.1",
-    "co-mocha": "^1.0.0"
+    "mocha": "^2.0.1",
+    "co-mocha": "^1.1.0"
   }
 }
