@@ -1,4 +1,12 @@
 
+2.0.1 / 2014-12-16
+==================
+
+ * add examples dir
+ * bump mongodb driver to 1.4.23
+ * bump devDeps
+ * Update README.md
+
 2.0.0 / 2014-10-10
 ==================
 
