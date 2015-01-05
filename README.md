@@ -147,6 +147,13 @@ Returns a thunk which when executed deletes the entire database.
 yield db.drop();
 ```
 
+#### list
+Returns a thunk which when executed list existing collections in the database.
+
+```js
+yield db.list();
+```
+
 #### ping
 Returns a thunk which when executed sends a to database.
 

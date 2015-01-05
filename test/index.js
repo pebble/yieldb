@@ -8,7 +8,7 @@ var m = require('../');
 require('co-mocha');
 
 // default test database
-var uri = process.env.YIELDB_TEST_URI;
+var uri = process.env.YIELDB_TEST_URI || 'mongodb://localhost/yieldb_test';
 if (!('string' == typeof uri && uri.length)) {
   throw new Error('Missing YIELDB_TEST_URI environment variable');
 }
@@ -1012,6 +1012,28 @@ describe('yieldb', function() {
         var user = db.col(name);
         assert(user instanceof m.Collection);
         assert.equal(name, user.name);
+      });
+    });
+
+    describe('list()', function() {
+      it('returns a thunk', function*() {
+        assert('function', typeof db.list());
+      });
+
+      it('list collection names', function*() {
+        var db = yield m.connect(uri);
+
+        var X = db.col('x');
+        yield [ X.insert({ pebble: true }) ];
+
+        var names = yield db.list();
+        yield X.drop();
+
+        assert.equal(2, names.length);
+        names = names.map(function(col) {
+          return col.name.replace(db.db.databaseName + '.', '');
+        }).sort();
+        assert.deepEqual(['system.indexes', 'x'], names);
       });
     });
 

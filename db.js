@@ -65,6 +65,21 @@ Db.prototype.drop = function() {
 }
 
 /**
+ * Returns a thunk which when executed
+ * list existing collections in the database.
+ *
+ *     yield db.list();
+ *
+ * @returns {Function} thunk
+ * @api public
+ */
+
+Db.prototype.list = function() {
+  debug('list()');
+  return this.db.listCollections.bind(this.db);
+}
+
+/**
  * Creates a new collection object for the given `name`.
  *
  *     var Trends = db.col('trends');
