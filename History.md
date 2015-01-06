@@ -1,4 +1,10 @@
 
+2.2.0 / 2015-01-06
+==================
+
+ * expose listCollections on native driver #5 [bitinn](https://github.com/bitinn)
+ * update driver to 1.2.28 (fixes #4)
+
 2.1.0 / 2014-12-16
 ==================
 
