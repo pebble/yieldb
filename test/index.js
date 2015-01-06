@@ -1015,6 +1015,28 @@ describe('yieldb', function() {
       });
     });
 
+    describe('listCollections()', function() {
+      it('returns a thunk', function*() {
+        assert('function', typeof db.listCollections());
+      });
+
+      it('list collection names', function*() {
+        var db = yield m.connect(uri);
+
+        var X = db.col('x');
+        yield [ X.insert({ pebble: true }) ];
+
+        var names = yield db.listCollections();
+        yield X.drop();
+
+        assert.equal(2, names.length);
+        names = names.map(function(col) {
+          return col.name.replace(db.db.databaseName + '.', '');
+        }).sort();
+        assert.deepEqual(['system.indexes', 'x'], names);
+      });
+    });
+
     describe('drop()', function() {
       it('returns a thunk', function*() {
         assert('function', typeof db.drop());
