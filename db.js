@@ -76,7 +76,8 @@ Db.prototype.drop = function() {
 
 Db.prototype.listCollections = function() {
   debug('listCollections()');
-  return this.db.listCollections.bind(this.db);
+  var cursor = this.db.listCollections();
+  return cursor.toArray.bind(cursor);
 }
 
 /**
