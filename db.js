@@ -68,14 +68,14 @@ Db.prototype.drop = function() {
  * Returns a thunk which when executed
  * list existing collections in the database.
  *
- *     yield db.list();
+ *     yield db.listCollections();
  *
  * @returns {Function} thunk
  * @api public
  */
 
-Db.prototype.list = function() {
-  debug('list()');
+Db.prototype.listCollections = function() {
+  debug('listCollections()');
   return this.db.listCollections.bind(this.db);
 }
 
