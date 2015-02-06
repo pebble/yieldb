@@ -1,6 +1,6 @@
 # yieldb
 
-Simple, expressive and yieldable MongoDB.
+Simple, expressive and yieldable MongoDB for [co](https://github.com/visionmedia/co/)/[koa](http://koajs.com/).
 
 [![Build Status](https://travis-ci.org/pebble/yieldb.svg?branch=master)](https://travis-ci.org/pebble/yieldb)
 [![Coverage Status](https://img.shields.io/coveralls/pebble/yieldb.svg)](https://coveralls.io/r/pebble/yieldb)
