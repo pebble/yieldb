@@ -15,7 +15,7 @@ co(function*(){
 
   var User = db.col('users');
 
-  yield User.insert(doc)    // thunk
+  yield User.insert(doc)    // promise/thunk
   yield User.findOne(id)    // mquery
   yield User.remove(id)     // mquery
   yield User.update(id, { $set: .. })    // mquery
@@ -70,11 +70,24 @@ Key features:
 
 Each collection method returns a yieldable. For example:
 
-```
+```js
 var User = db.col('users');
 
 yield User.insert({ name: 'yieldb' });
 var doc = yield User.find({ name: 'yieldb' });
+```
+
+Note that these yieldables are also `Promise`s for maximal compatibility
+with other modules:
+
+```js
+var User = db.col('users');
+
+User.insert({ name: 'yieldb' }).then(function(function() {
+  User.find({ name: 'yieldb' }).then(function(doc) {
+    console.log(doc);
+  }, onFail);
+}, onFail);
 ```
 
 #### _id casting
@@ -105,14 +118,24 @@ var docs = yield User.find({ role: 'developer' })
                      .read('primaryPreferred');
 ```
 
-_The methods which do not return `mquery` are `insert()` and `drop()`, which wouldn't
-make much sense, and `aggregrate()` which we aim to support in the future
-(Pull Request welcome)._
+_The methods which do not return an `mquery` are_
+
+- `insert()`
+- `drop()`
+- `index()`
+- `indexes()`.
+- `aggregate()`
+
+_However, these methods do return `Promise`s like every other collection method.
+In the future, `aggregate` will likely return an `mquery` once support has been
+added._
 
 #### promises
 
-Since most collection methods return an `mquery` instance, we get `Promise` support
-for free. Call the query builders `then()` method to receive a
+As mentioned above, all collection methods return `Promises`. Since most
+collection methods also return an `mquery` instance, we get `Promise` support
+for free everywhere. Call the query builders `then()` method anywhere in
+the chain to receive a
 [bluebird](https://github.com/petkaantonov/bluebird) `Promise`.
 
 ```js
@@ -190,7 +213,7 @@ yield db.col('watches').findOne(selector, options);
 
 Accepts either a single object or array of objects.
 Objects which do not have an `_id` will receive one assigned a new `ObjectId`.
-Returns a yieldable thunk.
+Returns a yieldable promise;
 
 ```
 yield db.col('watches').insert(obj, options);
@@ -215,7 +238,7 @@ yield db.col('watches').remove(selector, options);
 
 #### drop
 
-Returns a yieldable thunk.
+Returns a yieldable promise.
 
 ```
 yield db.col('watches').drop();
@@ -223,13 +246,13 @@ yield db.col('watches').drop();
 
 #### aggregate
 
-Accepts an array of pipeline operations and returns a yieldable thunk.
+Accepts an array of pipeline operations and returns a yieldable promise.
 
 ```
 yield db.col('watches').aggregate(pipeline);
 ```
 
-The thunk also has it's own `stream()` method if that's what you're after.
+The promise also has it's own `stream()` method if that's what you're after.
 
 ```
 yield db.col('watches').aggregate(pipeline).stream();
@@ -279,7 +302,7 @@ yield db.col('watches').where(selector).select('name email')
 #### index
 
 Creates an index.
-Returns a yieldable thunk.
+Returns a yieldable promise.
 
 ```
 yield db.col('watches').index(indexDefinition, options);
@@ -288,7 +311,7 @@ yield db.col('watches').index(indexDefinition, options);
 #### indexes
 
 Retreives an array of all defined indexes for this collection.
-Returns a yieldable thunk.
+Returns a yieldable promise.
 
 ```
 var indexes = yield db.col('watches').indexes();

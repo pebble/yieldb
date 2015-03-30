@@ -85,7 +85,7 @@ Collection.prototype.findOne = function(selector, opts) {
  *
  * @param {Object} obj
  * @param {Object} [options]
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  */
 
 Collection.prototype.insert = function(obj, opts) {
@@ -173,7 +173,7 @@ Collection.prototype.remove = function(selector, opts) {
  *
  *     yield User.drop();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  */
 
 Collection.prototype.drop = function() {
@@ -200,7 +200,7 @@ Collection.prototype.drop = function() {
  *
  * @param {Array} pipeline
  * @param {Object} [opts]
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  * @TODO remove when mquery supports aggregation
  */
 
@@ -335,7 +335,7 @@ Collection.prototype.where = function(arg) {
  *
  * @param {Object} indexDefinition
  * @param {Object} [options]
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  */
 
 Collection.prototype.index = function(def, opts) {
@@ -359,7 +359,7 @@ Collection.prototype.index = function(def, opts) {
  *     var User = db.col('users');
  *     var indexes = yield User.indexes();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  */
 
 Collection.prototype.indexes = function(opts) {
