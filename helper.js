@@ -3,6 +3,7 @@ var debug = require('debug')('yield:inputhelper');
 var isObject = require('is-object');
 var hasOwn = require('has-own');
 var ObjectId = require('mongodb').ObjectID;
+var mquery = require('mquery');
 
 exports.cast = function cast(arg) {
   debug('cast %s', arg);
@@ -47,3 +48,17 @@ function ensureId(doc) {
     doc._id = new ObjectId;
   }
 }
+
+exports.makeThen = function makeThen (fn) {
+  return function then(resolve, reject) {
+    var promise = new mquery.Promise(function(success, error) {
+      fn(function(err, res) {
+        promise = resolve = reject = fn = null;
+        if (err) return error(err);
+        success(res);
+      });
+    });
+    return promise.then(resolve, reject);
+  }
+}
+

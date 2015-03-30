@@ -71,7 +71,7 @@ Collection.prototype.findOne = function(selector, opts) {
  *
  * Responds with the detailed results from MongoDB.
  *
- *     var res = User.insert(docs, options);
+ *     var res = yield User.insert(docs, options);
  *     console.log(res);
  *     // { ok: 1,
  *     //   writeErrors: [],
@@ -103,10 +103,13 @@ Collection.prototype.insert = function(obj, opts) {
 
   var self = this;
 
-  return function insert(cb) {
+  function insert(cb) {
     debug('%s.insert(%j, %j)', self.name, obj, opts);
     self.col.insert(obj, opts, cb);
   }
+
+  insert.then = helper.makeThen(insert);
+  return insert;
 }
 
 /**

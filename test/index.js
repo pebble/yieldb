@@ -262,10 +262,24 @@ describe('yieldb', function() {
     });
 
     describe('#insert()', function() {
+      var id = 'insert-returns-a-promise';
+
+      before(function*() {
+        yield User.remove({ id: id });
+      });
+
       it('returns a thunk', function(done) {
         var fn = User.insert({});
         assert.equal('function', typeof fn);
         done();
+      });
+
+      it('returns a promise', function(done) {
+        var p = User.insert({ id: id });
+        p.then(win, done);
+        function win(res) {
+          done();
+        }
       });
 
       describe('arguments', function() {
@@ -1096,6 +1110,35 @@ describe('yieldb', function() {
 
         done();
       });
+    });
+
+    describe('makeThen()', function() {
+      it('returns function', function(done) {
+        var fn = helper.makeThen();
+        assert.equal('function', typeof fn);
+        done();
+      });
+
+      describe('creates a function which when executed', function() {
+        it('runs the function originally passed', function(done) {
+          var ran = false;
+          var fn = helper.makeThen(function(){
+            ran = true;
+          });
+
+          fn();
+          assert(ran);
+          done();
+        });
+
+        it('returns a promise', function(done) {
+          var fn = helper.makeThen(function(){});
+          var p = fn();
+          assert.equal('function', typeof p.then);
+          done();
+        });
+      });
+
     });
   });
 
