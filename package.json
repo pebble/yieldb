@@ -31,8 +31,8 @@
     "debug": "0.8.1",
     "has-own": "1.0.0",
     "is-object": "1.0.1",
-    "mongodb": "1.4.32",
-    "mquery": "1.3.0"
+    "mongodb": "1.4.35",
+    "mquery": "1.4.0"
   },
   "devDependencies": {
     "co": "^4.0.1",
