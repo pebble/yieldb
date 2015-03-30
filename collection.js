@@ -235,6 +235,7 @@ Collection.prototype.aggregate = function(pipeline, opts) {
     return self.col.aggregate(pipeline, o);
   }
 
+  aggregate.then = helper.makeThen(aggregate);
   return aggregate;
 }
 

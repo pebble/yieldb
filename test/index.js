@@ -622,6 +622,16 @@ describe('yieldb', function() {
         done();
       });
 
+      it('returns a promise', function(done) {
+        var p = User.aggregate([{ $match: { aggregate: true }}]);
+        p.then(win, done);
+        function win(arr) {
+          assert(Array.isArray(arr));
+          assert.equal(inserted.length, arr.length);
+          done();
+        }
+      });
+
       it('responds with an array', function*() {
         var arr = yield User.aggregate([{ $match: { aggregate: true }}]);
         assert(Array.isArray(arr));
