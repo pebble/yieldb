@@ -981,6 +981,15 @@ describe('yieldb', function() {
         done();
       });
 
+      it('returns a promise', function(done) {
+        var p = User.index({ x: 1 });
+        p.then(win, done);
+        function win(res) {
+          assert(res);
+          done();
+        }
+      });
+
       it('requires an index definition', function(done) {
         assert.throws(function() {
           User.index();

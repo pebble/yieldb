@@ -344,10 +344,13 @@ Collection.prototype.index = function(def, opts) {
   opts || (opts = {});
   var self = this;
 
-  return function index(cb) {
+  function index(cb) {
     debug('%s.index(%j, %j)', self.name, def, opts);
     self.col.ensureIndex(def, opts, cb);
   }
+
+  index.then = helper.makeThen(index);
+  return index;
 }
 
 /**
