@@ -5,6 +5,7 @@ var mongo = require('mongodb');
 var hasOwn = require('has-own');
 var assert = require('assert');
 var Collection = require('./collection');
+var helper = require('./helper');
 
 module.exports = exports = Db;
 
@@ -35,49 +36,53 @@ Db.init = function*(database) {
 }
 
 /**
- * Returns a thunk which when executed
- * closes the database connection.
+ * Returns a promise which closes the database connection.
  *
  *     yield db.close();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  * @api public
  */
 
 Db.prototype.close = function() {
   debug('close()');
-  return this.db.close.bind(this.db);
+  var fn = this.db.close.bind(this.db);
+  fn.then = helper.makeThen(fn);
+  return fn;
 }
 
 /**
- * Returns a thunk which when executed
- * deletes the _entire_ database.
+ * Returns a promise which deletes the _entire_ database.
  *
  *     yield db.drop();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  * @api public
  */
 
 Db.prototype.drop = function() {
   debug('drop()');
-  return this.db.dropDatabase.bind(this.db);
+  var fn = this.db.dropDatabase.bind(this.db);
+  fn.then = helper.makeThen(fn);
+  return fn;
 }
 
 /**
- * Returns a thunk which when executed
- * list existing collections in the database.
+ * Returns a promise which retreives the list of
+ * existing collections in the database.
  *
  *     yield db.listCollections();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  * @api public
  */
 
 Db.prototype.listCollections = function() {
   debug('listCollections()');
   var cursor = this.db.listCollections();
-  return cursor.toArray.bind(cursor);
+  var fn = cursor.toArray.bind(cursor);
+  fn.then = helper.makeThen(fn);
+  return fn;
 }
 
 /**
@@ -107,15 +112,17 @@ Db.prototype.col = Db.prototype.collection = function(name) {
  *
  *     var stats = yield db.ping();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  * @throws {Error} if the mongodb driver responds with an Error
  */
 
 Db.prototype.ping = function() {
   var db = this.db;
-  return function(cb) {
+  function ping(cb) {
     db.command({ ping: 1 }, cb);
   }
+  ping.then = helper.makeThen(ping);
+  return ping;
 }
 
 /**
@@ -127,7 +134,7 @@ Db.prototype.ping = function() {
  *
  *     var status = yield db.serverStatus();
  *
- * @returns {Function} thunk
+ * @returns {Promise/Function} promise
  * @throws {Error} if the mongodb driver responds with an Error
  */
 
@@ -135,7 +142,9 @@ Db.prototype.serverStatus = function() {
   debug('serverStatus()');
 
   var db = this.db;
-  return function(cb) {
+  function serverStatus(cb) {
     db.command({ serverStatus: 1 }, cb);
   }
+  serverStatus.then = helper.makeThen(serverStatus);
+  return serverStatus;
 }

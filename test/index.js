@@ -1061,6 +1061,10 @@ describe('yieldb', function() {
       it('returns a thunk', function*() {
         assert('function', typeof db.close());
       });
+
+      it('returns a promise', function*() {
+        assert('function', typeof db.close().then);
+      });
     });
 
     describe('col()', function() {
@@ -1075,6 +1079,10 @@ describe('yieldb', function() {
     describe('listCollections()', function() {
       it('returns a thunk', function*() {
         assert('function', typeof db.listCollections());
+      });
+
+      it('returns a promise', function*() {
+        assert('function', typeof db.listCollections().then);
       });
 
       it('list collection names', function*() {
@@ -1099,6 +1107,10 @@ describe('yieldb', function() {
         assert('function', typeof db.drop());
       });
 
+      it('returns a promise', function*() {
+        assert('function', typeof db.drop().then);
+      });
+
       it('deletes all database contents', function*() {
         var db = yield m.connect(uri);
 
@@ -1118,6 +1130,10 @@ describe('yieldb', function() {
         assert('function', typeof db.serverStatus());
       });
 
+      it('returns a thunk', function*() {
+        assert('function', typeof db.serverStatus().then);
+      });
+
       it('executes a serverStatus command', function*() {
         var res = yield db.serverStatus();
         assert(res.host);
@@ -1127,6 +1143,10 @@ describe('yieldb', function() {
     describe('ping()', function() {
       it('returns a thunk', function*() {
         assert('function', typeof db.ping());
+      });
+
+      it('returns a promise', function*() {
+        assert('function', typeof db.ping().then);
       });
 
       it('executes a ping command', function*() {

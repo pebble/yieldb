@@ -157,35 +157,35 @@ var users = db.col('users');
 
 #### close
 
-Returns a thunk which when executed closes the `db` connection.
+Returns a promise which closes the `db` connection.
 
 ```js
 yield db.close();
 ```
 
 #### drop
-Returns a thunk which when executed deletes the entire database.
+Returns a promise which deletes the entire database.
 
 ```js
 yield db.drop();
 ```
 
 #### listCollections
-Returns a thunk which when executed list existing collections in the database.
+Returns a promise which lists existing collections in the database.
 
 ```js
 yield db.listCollections();
 ```
 
 #### ping
-Returns a thunk which when executed sends a to database.
+Returns a promise which sends a ping to the database.
 
 ```js
 yield db.ping();
 ```
 
 #### serverStatus
-Returns a thunk which when executed responds with MongoDB status.
+Returns a promise which responds with MongoDB status.
 
 ```js
 yield db.serverStatus();
