@@ -961,6 +961,16 @@ describe('yieldb', function() {
         assert.equal('function', typeof fn);
       });
 
+      it('returns a promise', function(done) {
+        var p = User.indexes();
+        p.then(win, done);
+        function win(res) {
+          assert(Array.isArray(res));
+          assert.equal(1, res.length);
+          done();
+        }
+      });
+
       it('responds with an array', function*() {
         var info = yield User.indexes();
         assert(Array.isArray(info));

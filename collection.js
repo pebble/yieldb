@@ -367,10 +367,13 @@ Collection.prototype.indexes = function(opts) {
   if (!hasOwn('full', opts)) opts.full = true;
 
   var self = this;
-  return function indexes(cb) {
+  function indexes(cb) {
     debug('%s.indexes(%j)', self.name, opts);
     self.col.indexInformation(opts, cb);
   }
+
+  indexes.then = helper.makeThen(indexes);
+  return indexes;
 }
 
 // TODO
