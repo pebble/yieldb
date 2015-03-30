@@ -1,6 +1,6 @@
 {
   "name": "yieldb",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "MongoDB for co and koa",
   "main": "yieldb.js",
   "engines": {

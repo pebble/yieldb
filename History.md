@@ -1,4 +1,21 @@
 
+2.3.0 / 2015-03-29
+==================
+
+ * Add backward compatible Promise support
+ * Promisify db.close()
+ * Promisify db.drop()
+ * Promisify db.listCollections()
+ * Promisify db.ping()
+ * Promisify db.serverStatus()
+ * Promisify collection.indexes()
+ * Promisify collection.index()
+ * Promisify collection.aggregate()
+ * Promisify collection.drop()
+ * Promisify collection.insert()
+ * update mongodb and mquery
+ * use iojs
+
 2.2.2 / 2015-02-27
 ==================
 
