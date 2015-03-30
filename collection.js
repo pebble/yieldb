@@ -178,10 +178,13 @@ Collection.prototype.remove = function(selector, opts) {
 
 Collection.prototype.drop = function() {
   var self = this;
-  return function drop(cb) {
+  function drop(cb) {
     debug('%s.drop()', self.name);
     self.col.drop(cb);
   }
+
+  drop.then = helper.makeThen(drop);
+  return drop;
 }
 
 /**

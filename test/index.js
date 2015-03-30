@@ -879,6 +879,20 @@ describe('yieldb', function() {
         yield Dropper.drop();
         assert.strictEqual(0, yield Dropper.count());
       });
+
+      it('returns a promise', function(done) {
+        var fn = Dropper.insert({ large: 'r than life' })
+        fn(function(err) {
+          if (err) return done(err);
+          var p = Dropper.drop({});
+          p.then(win, done);
+          function win(res) {
+            assert(res);
+            done();
+          }
+        });
+      });
+
     });
 
     describe('#distinct()', function() {
