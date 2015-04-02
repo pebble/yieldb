@@ -18,6 +18,11 @@ exports.cast = function cast(arg) {
   if (!isObject(arg))
     throw new TypeError('invalid selector');
 
+  // find(ObjectId)
+  if (arg instanceof ObjectId) {
+    return { _id: arg };
+  }
+
   // find({ _id: '54049bff83359f9872f94c19' })
   if (arg._id && isHexString(arg._id)) {
     arg._id = new ObjectId(arg._id);

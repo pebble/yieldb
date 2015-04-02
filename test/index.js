@@ -180,6 +180,12 @@ describe('yieldb', function() {
           assert.equal(1, arr.length);
           assert.equal('Last Of Us', arr[0].name);
         });
+
+        it('ObjectId args to { _id: args }', function*() {
+          var arr = yield User.find(lastOfUs._id);
+          assert.equal(1, arr.length);
+          assert.equal('Last Of Us', arr[0].name);
+        });
       });
 
       describe('.stream()', function() {
@@ -255,6 +261,12 @@ describe('yieldb', function() {
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var arr = yield User.find({ _id: String(lastOfUs._id) });
+          assert.equal(1, arr.length);
+          assert.equal('Last Of Us', arr[0].name);
+        });
+
+        it('ObjectId args to { _id: args }', function*() {
+          var arr = yield User.find(lastOfUs._id);
           assert.equal(1, arr.length);
           assert.equal('Last Of Us', arr[0].name);
         });
@@ -503,6 +515,12 @@ describe('yieldb', function() {
           var doc = yield User.findOne(lastOfUs._id);
           assert.equal(4, doc.rating);
         });
+
+        it('ObjectID args to { _id: args }', function*() {
+          var numUpdated = yield User.update(lastOfUs._id, { $set: { rating: 3 }});
+          var doc = yield User.findOne(lastOfUs._id);
+          assert.equal(3, doc.rating);
+        });
       });
 
       it('returns the result of the operation', function*() {
@@ -576,10 +594,12 @@ describe('yieldb', function() {
       describe('casts', function() {
         var doc1 = { name: '#remove 1' };
         var doc2 = { name: '#remove 2' };
+        var doc3 = { name: '#remove 3' };
 
         before(function*() {
           yield User.insert(doc1);
           yield User.insert(doc2);
+          yield User.insert(doc3);
         });
 
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
@@ -595,6 +615,16 @@ describe('yieldb', function() {
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var id = String(doc2._id);
           var res = yield User.remove({ _id: id });
+          if (Array.isArray(res)) res = res[0];
+          assert.equal(1, res.n);
+
+          var doc = yield User.findOne(id);
+          assert.equal(null, doc);
+        });
+
+        it('ObjectId args to { _id: args }', function*() {
+          var id = doc3._id;
+          var res = yield User.remove(id);
           if (Array.isArray(res)) res = res[0];
           assert.equal(1, res.n);
 
@@ -665,6 +695,12 @@ describe('yieldb', function() {
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var id = String(lastOfUs._id);
           var arr = yield User.aggregate([{ $match: { _id: id } }]);
+          assert.equal(1, arr.length);
+          assert.equal('Last Of Us', arr[0].name);
+        });
+
+        it('ObjectId _id to { _id: args }', function*() {
+          var arr = yield User.aggregate([{ $match: lastOfUs._id }]);
           assert.equal(1, arr.length);
           assert.equal('Last Of Us', arr[0].name);
         });
@@ -774,6 +810,12 @@ describe('yieldb', function() {
           assert(doc);
           assert.equal('Last Of Us', doc.name);
         });
+
+        it('ObjectId args to { _id: args }', function*() {
+          var doc= yield User.findOneAndUpdate(lastOfUs._id, { $set: { findAndModified: 5 }});
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
+        });
       });
 
       describe('arguments', function() {
@@ -838,6 +880,13 @@ describe('yieldb', function() {
           assert.equal('Last Of Us', doc.name);
           yield User.insert(doc);
         });
+
+        it('ObjectId _id to { _id: args }', function*() {
+          var doc = yield User.findOneAndRemove(lastOfUs._id);
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
+          yield User.insert(doc);
+        });
       });
     });
 
@@ -872,6 +921,11 @@ describe('yieldb', function() {
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var count = yield User.count({ _id: String(lastOfUs._id) });
+          assert.strictEqual(1, count);
+        });
+
+        it('ObjectId args to { _id: args }', function*() {
+          var count = yield User.count(lastOfUs._id);
           assert.strictEqual(1, count);
         });
       });
@@ -950,6 +1004,11 @@ describe('yieldb', function() {
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var distinct = yield User.distinct('distinct', { _id: String(doc1._id) });
+          assert.equal('pebble', distinct[0]);
+        });
+
+        it('ObjectId args to { _id: args }', function*() {
+          var distinct = yield User.distinct('distinct', doc1._id);
           assert.equal('pebble', distinct[0]);
         });
       });
