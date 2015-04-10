@@ -1,10 +1,11 @@
 language: node_js
-node_js:
-- iojs
-services:
-- mongodb
-env:
-- YIELDB_TEST_URI=mongodb://localhost/yieldb_test
-
+matrix:
+  include:
+    - node_js: "0.12"
+      env: YIELDB_TEST_URI=mongodb://localhost/yieldb_test MOCHA_OPTS=--harmony-generators
+      services: mongodb
+    - node_js: "iojs"
+      env: YIELDB_TEST_URI=mongodb://localhost/yieldb_test
+      services: mongodb
 script: "make test-travis"
 after_script: "npm install coveralls@2.11.1 && cat ./coverage/lcov.info | coveralls"
