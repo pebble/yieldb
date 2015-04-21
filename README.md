@@ -197,7 +197,7 @@ yield db.serverStatus();
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').find(selector, options);
 ```
 
@@ -205,7 +205,7 @@ yield db.col('watches').find(selector, options);
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').findOne(selector, options);
 ```
 
@@ -215,7 +215,7 @@ Accepts either a single object or array of objects.
 Objects which do not have an `_id` will receive one assigned a new `ObjectId`.
 Returns a yieldable promise;
 
-```
+```js
 yield db.col('watches').insert(obj, options);
 yield db.col('watches').insert([obj1, obj2, ..], options);
 ```
@@ -224,15 +224,21 @@ yield db.col('watches').insert([obj1, obj2, ..], options);
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').update(selector, update, options);
+```
+
+###### Default options:
+
+```js
+{ multi: true, fullResult: true }
 ```
 
 #### remove
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').remove(selector, options);
 ```
 
@@ -240,7 +246,7 @@ yield db.col('watches').remove(selector, options);
 
 Returns a yieldable promise.
 
-```
+```js
 yield db.col('watches').drop();
 ```
 
@@ -248,13 +254,13 @@ yield db.col('watches').drop();
 
 Accepts an array of pipeline operations and returns a yieldable promise.
 
-```
+```js
 yield db.col('watches').aggregate(pipeline);
 ```
 
 The promise also has it's own `stream()` method if that's what you're after.
 
-```
+```js
 yield db.col('watches').aggregate(pipeline).stream();
 ```
 
@@ -262,7 +268,7 @@ yield db.col('watches').aggregate(pipeline).stream();
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').findOneAndUpdate(selector, update, options)
 ```
 
@@ -270,7 +276,7 @@ yield db.col('watches').findOneAndUpdate(selector, update, options)
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').findOneAndRemove(selector, options)
 ```
 
@@ -278,7 +284,7 @@ yield db.col('watches').findOneAndRemove(selector, options)
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').count(selector, options)
 ```
 
@@ -286,7 +292,7 @@ yield db.col('watches').count(selector, options)
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').distinct(key [, query]);
 ```
 
@@ -295,7 +301,7 @@ yield db.col('watches').distinct(key [, query]);
 
 Returns a yieldable mquery instance.
 
-```
+```js
 yield db.col('watches').where(selector).select('name email')
 ```
 
@@ -304,7 +310,7 @@ yield db.col('watches').where(selector).select('name email')
 Creates an index.
 Returns a yieldable promise.
 
-```
+```js
 yield db.col('watches').index(indexDefinition, options);
 ```
 
@@ -313,7 +319,7 @@ yield db.col('watches').index(indexDefinition, options);
 Retreives an array of all defined indexes for this collection.
 Returns a yieldable promise.
 
-```
+```js
 var indexes = yield db.col('watches').indexes();
 ```
 
