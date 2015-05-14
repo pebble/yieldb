@@ -1,4 +1,12 @@
 
+2.4.0 / 2015-05-14
+==================
+
+ * fixed; db.close().then resolution not always firing #11
+ * updated; mongo driver to 1.4.37
+ * updated; docs
+ * travis: support node 0.12
+
 2.3.1 / 2015-03-31
 ==================
 
