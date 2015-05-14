@@ -1065,6 +1065,27 @@ describe('yieldb', function() {
       it('returns a promise', function*() {
         assert('function', typeof db.close().then);
       });
+
+      describe('promise resolver fn', function() {
+        var database;
+        before(function*() {
+          database = yield m.connect(uri);
+        });
+
+        it('executes when promise is immediately resolved', function(done) {
+          // https://github.com/pebble/yieldb/issues/11
+
+          var resolved = false;
+          database.close().then(function(){
+            resolved = true;
+          }, done);
+
+          setTimeout(function(){
+            assert(resolved, 'resolve fn did not fire');
+            done();
+          }, 5);
+        });
+      });
     });
 
     describe('col()', function() {
