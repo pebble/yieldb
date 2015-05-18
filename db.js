@@ -46,20 +46,9 @@ Db.init = function*(database) {
 
 Db.prototype.close = function() {
   debug('close()');
-
-  var self = this;
-  function dbCloseTimingFix(cb) {
-    // mongodb driver immediately executes the db.close callback, breaking
-    // node callback execution order expectations. when that bug is
-    // fixed, remove setImmediate()
-    setImmediate(function() {
-      self.db.close(cb);
-      self = dbCloseTimingFix = cb = null;
-    })
-  }
-
-  dbCloseTimingFix.then = helper.makeThen(dbCloseTimingFix);
-  return dbCloseTimingFix;
+  var fn = this.db.close.bind(this.db);
+  fn.then = helper.makeThen(fn);
+  return fn;
 }
 
 /**
