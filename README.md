@@ -323,6 +323,20 @@ Returns a yieldable promise.
 var indexes = yield db.col('watches').indexes();
 ```
 
+#### setOptions
+
+Sets default collection options which apply to all methods of this collection.
+
+```js
+var User = db.col('users');
+User.setOptions({ maxTime: 500 });
+yield User.find();
+```
+
+Options are passed to the
+[mquery.setOptions](https://github.com/aheckmann/mquery#setoptionsoptions) method.
+All [mquery](https://github.com/aheckmann/mquery) options are supported.
+
 ### Installation
 
 ```

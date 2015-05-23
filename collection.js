@@ -21,6 +21,22 @@ function Collection(db, name) {
 }
 
 /**
+ * Applies the given `options` to all queries/updates run by
+ * this collection. All mquery options are supported.
+ *
+ *     var User = db.col('User');
+ *     User.setOptions({ maxTime: 500 });
+ *     var results = yield User.find();
+ *
+ * @param {Object} options
+ * @returns {undefined}
+ */
+
+Collection.prototype.setOptions = function(options) {
+  this.query = mquery(this.col).setOptions(options).toConstructor();
+}
+
+/**
  * Returns a query which when executed performs a find.
  *
  *     var User = db.col('User');

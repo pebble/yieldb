@@ -1034,6 +1034,16 @@ describe('yieldb', function() {
       });
     });
 
+    describe('#setOptions', function() {
+      it('sets default options for all queries', function(done) {
+        var C = db.col('options');
+        C.setOptions({ maxTime: 500 });
+        var query = C.find();
+        assert.equal(500, query.options.maxTimeMS);
+        done();
+      });
+    });
+
     /*
     describe('#mapReduce', function() {
       // casting
