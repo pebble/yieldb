@@ -234,41 +234,39 @@ describe('yieldb', function() {
 
       it('accepts a selector', function*() {
         var res = yield {
-          zero: User.find({x:1})
-        , one: User.find({ name: 'Last Of Us' })
+          zero: User.findOne({x:1})
+        , one: User.findOne({ name: 'Last Of Us' })
         }
 
-        assert.equal(0, res.zero.length);
-        assert.equal(1, res.one.length);
+        assert(!res.zero);
+        assert(res.one);
       });
 
       it('accepts options', function*() {
-        var arr = yield User.find({}, { select: '-_id' });
-        assert.equal(2, arr.length);
-        arr.forEach(function(doc) {
-          assert(doc.name);
-          assert(!doc.isNew);
-          assert(!doc._id);
-        })
+        var doc = yield User.findOne({}, { select: '-_id' });
+        assert(doc);
+        assert(doc.name);
+        assert(!doc.isNew);
+        assert(!doc._id);
       });
 
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
-          var arr = yield User.find(String(lastOfUs._id));
-          assert.equal(1, arr.length);
-          assert.equal('Last Of Us', arr[0].name);
+          var doc = yield User.findOne(String(lastOfUs._id));
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
         });
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
-          var arr = yield User.find({ _id: String(lastOfUs._id) });
-          assert.equal(1, arr.length);
-          assert.equal('Last Of Us', arr[0].name);
+          var doc = yield User.findOne({ _id: String(lastOfUs._id) });
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
         });
 
         it('ObjectId args to { _id: args }', function*() {
-          var arr = yield User.find(lastOfUs._id);
-          assert.equal(1, arr.length);
-          assert.equal('Last Of Us', arr[0].name);
+          var doc = yield User.findOne(lastOfUs._id);
+          assert(doc);
+          assert.equal('Last Of Us', doc.name);
         });
       });
     });
