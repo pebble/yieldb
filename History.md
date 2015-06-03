@@ -1,4 +1,11 @@
 
+2.6.0 / 2015-06-03
+==================
+
+ * add ObjectId casting support #12 [Jtupiter](https://github.com/Jtupiter)
+ * bump mquery to 1.6.0
+ * fix findOne tests
+
 2.5.0 / 2015-05-22
 ==================
 
