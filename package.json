@@ -32,7 +32,7 @@
     "has-own": "1.0.0",
     "is-object": "1.0.1",
     "mongodb": "1.4.38",
-    "mquery": "1.5.0"
+    "mquery": "1.6.0"
   },
   "devDependencies": {
     "co": "^4.0.1",
