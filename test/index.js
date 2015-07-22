@@ -1083,6 +1083,60 @@ describe('yieldb', function() {
       });
     });
 
+    describe('#dropIndex()', function() {
+      it('returns a thunk', function(done) {
+        var fn = User.dropIndex({ name: 1 });
+        assert.equal('function', typeof fn);
+        done();
+      });
+
+      it('returns a promise', function(done) {
+        var p = User.dropIndex({ x: 1 });
+        p.then(win, done);
+        function win(res) {
+          assert(res);
+          done();
+        }
+      });
+
+      it('requires an index definition', function(done) {
+        assert.throws(function() {
+          User.dropIndex();
+        }, /missing/);
+        done();
+      });
+
+      it('accepts string input', function*() {
+        var name = 'qwertyui';
+        var def = {};
+        def[name] = 1;
+
+        var res = yield User.index(def, { sparse: true });
+        var info = yield User.indexes();
+        assert.equal(3, info.length);
+
+        var indexDefString = name + '_1';
+        var res = yield User.dropIndex(indexDefString);
+        var info = yield User.indexes();
+        assert.equal(2, info.length);
+      });
+
+      it('accepts object input', function*() {
+        var name = 'asdfghjk';
+        var def = {};
+        def[name] = 1;
+
+        var res = yield User.index(def, { sparse: true });
+        var info = yield User.indexes();
+        assert.equal(3, info.length);
+
+        var indexDefObject = def;
+        var res = yield User.dropIndex(indexDefObject);
+        var info = yield User.indexes();
+        assert.equal(2, info.length);
+      });
+    });
+
     describe('#where()', function() {
       it('returns an mquery', function(done) {
         var query = User.where('x');
