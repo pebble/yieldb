@@ -370,6 +370,41 @@ Collection.prototype.index = function(def, opts) {
 }
 
 /**
+ * Drop an index
+ *
+ *     var User = db.col('users');
+ *     yield User.dropIndex('name_1_email_-1');
+ *     yield User.dropIndex({ name: 1, email: -1 });
+ *
+ * @param {String|Object} indexDefinition
+ * @returns {Promise/Function} promise
+ */
+
+Collection.prototype.dropIndex = function(def) {
+  if (!def) throw new TypeError('missing index definition');
+
+  var defString = '';
+  if (typeof def === 'object') {
+    for (var prop in def) {
+      defString += prop + '_' + def[prop].toString() + '_';
+    }
+    defString = defString.slice(0, -1);
+  } else {
+    defString = def;
+  }
+
+  var self = this;
+
+  function index(cb) {
+    debug('%s.index(%j, %j)', self.name, defString);
+    self.col.dropIndex(defString, cb);
+  }
+
+  index.then = helper.makeThen(index);
+  return index;
+}
+
+/**
  * Retreives all indexes for the given collection
  *
  *     var User = db.col('users');

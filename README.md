@@ -314,6 +314,15 @@ Returns a yieldable promise.
 yield db.col('watches').index(indexDefinition, options);
 ```
 
+#### dropIndex
+
+Drops an index.
+Returns a yieldable promise.
+
+```js
+yield db.col('watches').dropIndex(indexDefinition);
+```
+
 #### indexes
 
 Retreives an array of all defined indexes for this collection.

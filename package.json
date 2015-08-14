@@ -31,12 +31,12 @@
     "debug": "0.8.1",
     "has-own": "1.0.0",
     "is-object": "1.0.1",
-    "mongodb": "1.4.38",
-    "mquery": "1.6.0"
+    "mongodb": "1.4.39",
+    "mquery": "1.6.2"
   },
   "devDependencies": {
     "co": "^4.0.1",
-    "istanbul-harmony": "^0.2.9",
+    "istanbul-harmony": "^0.3.16",
     "mocha": "^2.0.1",
     "co-mocha": "^1.1.0"
   }
