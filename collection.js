@@ -377,11 +377,10 @@ Collection.prototype.index = function(def, opts) {
  *     yield User.dropIndex({ name: 1, email: -1 });
  *
  * @param {String|Object} indexDefinition
- * @param {Object} [options]
  * @returns {Promise/Function} promise
  */
 
-Collection.prototype.dropIndex = function(def, opts) {
+Collection.prototype.dropIndex = function(def) {
   if (!def) throw new TypeError('missing index definition');
 
   var defString = '';
@@ -394,12 +393,11 @@ Collection.prototype.dropIndex = function(def, opts) {
     defString = def;
   }
 
-  opts || (opts = {});
   var self = this;
 
   function index(cb) {
-    debug('%s.index(%j, %j)', self.name, defString, opts);
-    self.col.dropIndex(defString, opts, cb);
+    debug('%s.index(%j, %j)', self.name, defString);
+    self.col.dropIndex(defString, cb);
   }
 
   index.then = helper.makeThen(index);

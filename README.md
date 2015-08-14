@@ -320,7 +320,7 @@ Drops an index.
 Returns a yieldable promise.
 
 ```js
-yield db.col('watches').dropIndex(indexDefinition, options);
+yield db.col('watches').dropIndex(indexDefinition);
 ```
 
 #### indexes
