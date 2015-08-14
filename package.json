@@ -1,6 +1,6 @@
 {
   "name": "yieldb",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Simple, expressive and yieldable MongoDB for co and koa",
   "main": "yieldb.js",
   "engines": {

@@ -1,4 +1,10 @@
 
+2.7.0 / 2015-08-14
+==================
+
+ * dropindex support [bitinn](https://github.com/bitinn)
+ * upgrade mongo, mquery & istanbul dependencies
+
 2.6.0 / 2015-06-03
 ==================
 
