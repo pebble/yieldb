@@ -396,7 +396,7 @@ Collection.prototype.dropIndex = function(def) {
   var self = this;
 
   function index(cb) {
-    debug('%s.index(%j, %j)', self.name, defString);
+    debug('%s.dropIndex(%j)', self.name, def);
     self.col.dropIndex(defString, cb);
   }
 
