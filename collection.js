@@ -397,13 +397,13 @@ Collection.prototype.dropIndex = function(def) {
 
   var self = this;
 
-  function index(cb) {
+  function dropIndex(cb) {
     debug('%s.dropIndex(%j)', self.name, def);
     self.col.dropIndex(defString, cb);
   }
 
-  index.then = helper.makeThen(index);
-  return index;
+  dropIndex.then = helper.makeThen(dropIndex);
+  return dropIndex;
 }
 
 function invalidIndexDefinitionError() {
