@@ -381,16 +381,18 @@ Collection.prototype.index = function(def, opts) {
  */
 
 Collection.prototype.dropIndex = function(def) {
-  if (!def) throw new TypeError('missing index definition');
+  if (!def) throw invalidIndexDefinitionError();
 
   var defString = '';
-  if (typeof def === 'object') {
+  if (isObject(def) && !Array.isArray(def)) {
     for (var prop in def) {
-      defString += prop + '_' + def[prop].toString() + '_';
+      defString += prop + '_' + def[prop] + '_';
     }
     defString = defString.slice(0, -1);
-  } else {
+  } else if (typeof def === 'string') {
     defString = def;
+  } else {
+    throw invalidIndexDefinitionError();
   }
 
   var self = this;
@@ -402,6 +404,10 @@ Collection.prototype.dropIndex = function(def) {
 
   index.then = helper.makeThen(index);
   return index;
+}
+
+function invalidIndexDefinitionError() {
+  return new TypeError('invalid index definition: must be string or object');
 }
 
 /**

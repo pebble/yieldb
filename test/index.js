@@ -1099,11 +1099,10 @@ describe('yieldb', function() {
         }
       });
 
-      it('requires an index definition', function(done) {
+      it('requires an index definition', function() {
         assert.throws(function() {
           User.dropIndex();
-        }, /missing/);
-        done();
+        }, /invalid index definition/);
       });
 
       it('accepts string input', function*() {
@@ -1134,6 +1133,23 @@ describe('yieldb', function() {
         var res = yield User.dropIndex(indexDefObject);
         var info = yield User.indexes();
         assert.equal(2, info.length);
+      });
+
+      it('rejects non-string, non-objects', function*(){
+        var invalids = [
+          null,
+          undefined,
+          [],
+          Math.max,
+          NaN,
+          394
+        ];
+
+        invalids.forEach(function(invalid) {
+          assert.throws(function() {
+            User.dropIndex(invalid);
+          }, /invalid index definition/);
+        });
       });
     });
 
