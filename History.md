@@ -1,4 +1,11 @@
 
+2.7.1 / 2015-08-15
+==================
+
+ * fix dropIndex fn name
+ * fix dropIndex debug message #17 [bitinn](https://github.com/bitinn)
+ * add dropIndex validation
+
 2.7.0 / 2015-08-14
 ==================
 
