@@ -29,6 +29,9 @@
   "license": "MIT",
   "dependencies": {
     "debug": "0.8.1",
+    "eslint": "^1.2.0",
+    "eslint-plugin-standard": "^1.2.0",
+    "eslint-config-pebble": "^1.2.0",
     "has-own": "1.0.0",
     "is-object": "1.0.1",
     "mongodb": "1.4.39",
@@ -39,5 +42,10 @@
     "istanbul-harmony": "^0.3.16",
     "mocha": "^2.0.1",
     "co-mocha": "^1.1.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "pebble"
+    ]
   }
 }

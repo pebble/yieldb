@@ -1,3 +1,4 @@
+'use strict';
 
 var mquery = require('mquery');
 var assert = require('assert');
@@ -9,7 +10,7 @@ require('co-mocha');
 
 // default test database
 var uri = process.env.YIELDB_TEST_URI;
-if (!('string' == typeof uri && uri.length)) {
+if (!(typeof uri === 'string' && uri.length)) {
   throw new Error('Missing YIELDB_TEST_URI environment variable');
 }
 
@@ -48,7 +49,7 @@ describe('yieldb', function() {
     });
   });
 
-  describe('Collection', function(){
+  describe('Collection', function() {
     describe('without overriding mquery.Promise', function() {
       testCollections();
     });
@@ -56,12 +57,12 @@ describe('yieldb', function() {
     describe('with overriding mquery.Promise', function() {
       var orig;
 
-      function before(){
+      function before() {
         orig = m.mquery.Promise;
         m.mquery.Promise = Promise;
       }
 
-      function after(){
+      function after() {
         m.mquery.Promise = orig;
       }
 
@@ -75,7 +76,6 @@ describe('yieldb', function() {
     var Dropper;
     var name = 'users';
     var lastOfUs;
-    var zelda;
 
     before(function*() {
       if (bf) bf();
@@ -90,9 +90,9 @@ describe('yieldb', function() {
         User.col.insert({ name: 'Last Of Us' }, cb);
       })[0];
 
-      zelda = (yield function(cb) {
+      yield function(cb) {
         User.col.insert({ name: 'Zelda' }, cb);
-      })[0];
+      };
     });
 
     after(function*() {
@@ -100,11 +100,11 @@ describe('yieldb', function() {
 
       yield function(cb) {
         User.col.drop(cb);
-      }
+      };
     });
 
     it('requires a collection name', function(done) {
-      assert.throws(function(){
+      assert.throws(function() {
         db.col();
       }, /must be a string/);
       done();
@@ -116,7 +116,8 @@ describe('yieldb', function() {
       done();
     });
 
-    it('returns the same collection object if called twice w same name', function(done) {
+    it('returns the same collection object if called twice w same name',
+    function(done) {
       var c1 = db.col('asdf');
       var c2 = db.col('asdf');
       assert.strictEqual(c1, c2);
@@ -150,22 +151,22 @@ describe('yieldb', function() {
 
       it('accepts a selector', function*() {
         var res = yield {
-          zero: User.find({x:1})
-        , one: User.find({ name: 'Last Of Us' })
-        }
+          zero: User.find({ x: 1 }),
+          one: User.find({ name: 'Last Of Us' })
+        };
 
         assert.equal(0, res.zero.length);
         assert.equal(1, res.one.length);
       });
 
       it('accepts options', function*() {
-        var arr = yield User.find({}, { select: { _id: 0 }});
+        var arr = yield User.find({}, { select: { _id: 0 } });
         assert.equal(2, arr.length);
         arr.forEach(function(doc) {
           assert(doc.name);
           assert(!doc.isNew);
           assert(!doc._id);
-        })
+        });
       });
 
       describe('casts', function() {
@@ -197,7 +198,7 @@ describe('yieldb', function() {
 
           stream.on('data', function(doc) {
             docs.push(doc);
-          })
+          });
 
           stream.on('error', function(error) {
             err = error;
@@ -207,7 +208,7 @@ describe('yieldb', function() {
             if (err) return done(err);
             assert.equal(2, docs.length);
             done();
-          })
+          });
         });
       });
     });
@@ -234,9 +235,9 @@ describe('yieldb', function() {
 
       it('accepts a selector', function*() {
         var res = yield {
-          zero: User.findOne({x:1})
-        , one: User.findOne({ name: 'Last Of Us' })
-        }
+          zero: User.findOne({ x: 1 }),
+          one: User.findOne({ name: 'Last Of Us' })
+        };
 
         assert(!res.zero);
         assert(res.one);
@@ -295,27 +296,27 @@ describe('yieldb', function() {
       describe('arguments', function() {
         describe('throws', function() {
           it('when nothing is passed', function*() {
-            assert.throws(function(){
+            assert.throws(function() {
               User.insert();
-            })
+            });
           });
           it('when undefined is passed', function*() {
-            assert.throws(function(){
+            assert.throws(function() {
               User.insert(undefined);
-            })
+            });
           });
           it('when null is passed', function*() {
-            assert.throws(function(){
+            assert.throws(function() {
               User.insert(null);
-            })
+            });
           });
           it('when function is passed', function*() {
-            assert.throws(function(){
-              User.insert(function(){});
-            })
+            assert.throws(function() {
+              User.insert(function() {});
+            });
           });
           it('when array containing non-objects is passed', function*() {
-            assert.throws(function(){
+            assert.throws(function() {
               User.insert([null]);
             });
           });
@@ -450,7 +451,7 @@ describe('yieldb', function() {
           });
 
           it('defaults to true', function*() {
-            yield User.update({ updateMulti: true }, { $addToSet: { x: ':)' }});
+            yield User.update({ updateMulti: true }, { $addToSet: { x: ':)' } });
 
             var found = yield User.find({ updateMulti: true });
 
@@ -462,13 +463,16 @@ describe('yieldb', function() {
           });
 
           it('can be overridden', function*() {
-            yield User.update({ updateMulti: true }, { $set: { i: 'changed' }}, { multi: false });
+            var query = { updateMulti: true };
+            var update = { $set: { i: 'changed' } };
+            var opts = { multi: false };
+            yield User.update(query, update, opts);
 
             var found = yield User.find({ updateMulti: true });
             var updated = 0;
 
             found.forEach(function(doc) {
-              if ('changed' == doc.i) updated++;
+              if (doc.i === 'changed') updated++;
             });
 
             assert.equal(1, updated);
@@ -489,9 +493,9 @@ describe('yieldb', function() {
 
           it('can be overridden', function*() {
             var res = yield User.update(
-              { test: 'fullResult'}
-            , { $set: { x: 1 }}
-            , { fullResult: false }
+              { test: 'fullResult' },
+              { $set: { x: 1 } },
+              { fullResult: false }
             );
             assert.equal(3, res);
           });
@@ -500,7 +504,7 @@ describe('yieldb', function() {
 
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
-          var res = yield User.update(String(lastOfUs._id), { $set: { rating: 5 }});
+          var res = yield User.update(String(lastOfUs._id), { $set: { rating: 5 } });
           if (Array.isArray(res)) res = res[0];
           assert.equal(1, res.n);
 
@@ -509,13 +513,13 @@ describe('yieldb', function() {
         });
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
-          var numUpdated = yield User.update({ _id: String(lastOfUs._id) }, { $set: { rating: 4 }});
+          yield User.update({ _id: String(lastOfUs._id) }, { $set: { rating: 4 } });
           var doc = yield User.findOne(lastOfUs._id);
           assert.equal(4, doc.rating);
         });
 
         it('ObjectID args to { _id: args }', function*() {
-          var numUpdated = yield User.update(lastOfUs._id, { $set: { rating: 3 }});
+          yield User.update(lastOfUs._id, { $set: { rating: 3 } });
           var doc = yield User.findOne(lastOfUs._id);
           assert.equal(3, doc.rating);
         });
@@ -523,7 +527,7 @@ describe('yieldb', function() {
 
       it('returns the result of the operation', function*() {
         var selector = { _id: 'update returns the result of the op' };
-        var res = yield User.update(selector, { $set: { x: 1 }});
+        var res = yield User.update(selector, { $set: { x: 1 } });
         assert(res);
         if (Array.isArray(res)) res = res[0];
         assert.equal(0, res.n);
@@ -533,7 +537,7 @@ describe('yieldb', function() {
 
     describe('#remove()', function() {
       it('returns an mquery', function(done) {
-        var query = User.remove({_id: '#remove' });
+        var query = User.remove({ _id: '#remove' });
         assert(query instanceof mquery);
         done();
       });
@@ -635,9 +639,9 @@ describe('yieldb', function() {
     describe('#aggregate()', function() {
 
       var inserted = [
-        { aggregate: true, x: 0 }
-      , { aggregate: true, x: 1 }
-      , { aggregate: true, x: 2 }
+        { aggregate: true, x: 0 },
+        { aggregate: true, x: 1 },
+        { aggregate: true, x: 2 }
       ];
 
       before(function*() {
@@ -651,7 +655,7 @@ describe('yieldb', function() {
       });
 
       it('returns a promise', function(done) {
-        var p = User.aggregate([{ $match: { aggregate: true }}]);
+        var p = User.aggregate([{ $match: { aggregate: true } }]);
         p.then(win, done);
         function win(arr) {
           assert(Array.isArray(arr));
@@ -661,7 +665,7 @@ describe('yieldb', function() {
       });
 
       it('responds with an array', function*() {
-        var arr = yield User.aggregate([{ $match: { aggregate: true }}]);
+        var arr = yield User.aggregate([{ $match: { aggregate: true } }]);
         assert(Array.isArray(arr));
         assert.equal(inserted.length, arr.length);
       });
@@ -674,9 +678,12 @@ describe('yieldb', function() {
 
       it('accepts a pipeline array', function*() {
         var res = yield {
-          zero: User.aggregate([{ $match: { aggregate: true }}, { $match: {x: {$lt: 0}}} ])
-        , one: User.aggregate([{ $match: { aggregate: true }}, { $limit: 1 }])
-        }
+          zero: User.aggregate([
+            { $match: { aggregate: true } },
+            { $match: { x: { $lt: 0 } } }
+          ]),
+          one: User.aggregate([{ $match: { aggregate: true } }, { $limit: 1 }])
+        };
 
         assert.equal(0, res.zero.length);
         assert.equal(1, res.one.length);
@@ -712,7 +719,7 @@ describe('yieldb', function() {
           var stream = User.aggregate([{ $match: { aggregate: true } }]).stream();
           stream.on('readable', function() {
             var doc;
-            while (null !== (doc = stream.read())) {
+            while ((doc = stream.read()) !== null) {
               docs.push(doc);
             }
           });
@@ -725,7 +732,7 @@ describe('yieldb', function() {
             if (err) return done(err);
             assert.equal(3, docs.length);
             done();
-          })
+          });
         });
 
         it('accepts options', function(done) {
@@ -733,13 +740,13 @@ describe('yieldb', function() {
           var docs = [];
 
           var stream = User.aggregate(
-            [{ $match: { aggregate: true } }]
-          , { cursor: { batchSize: 4 }}
+            [{ $match: { aggregate: true } }],
+            { cursor: { batchSize: 4 } }
           ).stream();
 
           stream.on('readable', function() {
             var doc;
-            while (null !== (doc = stream.read())) {
+            while ((doc = stream.read()) !== null) {
               docs.push(doc);
             }
           });
@@ -752,7 +759,7 @@ describe('yieldb', function() {
             if (err) return done(err);
             assert.equal(3, docs.length);
             done();
-          })
+          });
         });
       });
 
@@ -769,8 +776,8 @@ describe('yieldb', function() {
 
     describe('#findOneAndUpdate()', function() {
       var inserted = [
+        { findOneAndUpdate: true },
         { findOneAndUpdate: true }
-      , { findOneAndUpdate: true }
       ];
 
       before(function*() {
@@ -784,33 +791,43 @@ describe('yieldb', function() {
       });
 
       it('responds with a single doc', function*() {
-        var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true }, { $set: { color: 'green' }});
+        var query = { findOneAndUpdate: true };
+        var update = { $set: { color: 'green' } };
+        var doc = yield User.findOneAndUpdate(query, update);
         assert(doc);
         assert.equal('green', doc.color);
       });
 
       it('does not throw an error when no doc is found', function*() {
-        var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true, asdf: '3hfa' }, { $set: { color: 'green' }});
+        var query = { findOneAndUpdate: true, asdf: '3hfa' };
+        var update = { $set: { color: 'green' } };
+        var doc = yield User.findOneAndUpdate(query, update);
         assert.equal(null, doc);
       });
 
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
           var id = String(lastOfUs._id);
-          var doc= yield User.findOneAndUpdate(id, { $set: { findAndModified: 5 }});
+          var doc = yield User.findOneAndUpdate(id, {
+            $set: { findAndModified: 5 }
+          });
           assert(doc);
           assert.equal('Last Of Us', doc.name);
         });
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var id = String(lastOfUs._id);
-          var doc= yield User.findOneAndUpdate({ _id: id }, { $unset: { findAndModified: true }});
+          var doc = yield User.findOneAndUpdate({ _id: id }, {
+            $unset: { findAndModified: true }
+          });
           assert(doc);
           assert.equal('Last Of Us', doc.name);
         });
 
         it('ObjectId args to { _id: args }', function*() {
-          var doc= yield User.findOneAndUpdate(lastOfUs._id, { $set: { findAndModified: 5 }});
+          var doc = yield User.findOneAndUpdate(lastOfUs._id, {
+            $set: { findAndModified: 5 }
+          });
           assert(doc);
           assert.equal('Last Of Us', doc.name);
         });
@@ -820,14 +837,19 @@ describe('yieldb', function() {
         describe('options', function() {
           describe('new', function() {
             it('defaults to true', function*() {
-              var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true }, { $set: { color: 'blue' }});
+              var query = { findOneAndUpdate: true };
+              var update = { $set: { color: 'blue' } };
+              var doc = yield User.findOneAndUpdate(query, update);
               assert(doc);
               assert.equal('blue', doc.color);
             });
             it('can be overridden', function*() {
-              var doc = yield User.findOneAndUpdate({ findOneAndUpdate: true }, { $set: { color: 'red' }}, { new: false });
+              var query = { findOneAndUpdate: true };
+              var update = { $set: { color: 'red' } };
+              var opts = { new: false };
+              var doc = yield User.findOneAndUpdate(query, update, opts);
               assert(doc);
-              assert('red' !== doc.color);
+              assert(doc.color !== 'red');
             });
           });
         });
@@ -836,8 +858,8 @@ describe('yieldb', function() {
 
     describe('#findOneAndRemove()', function() {
       var inserted = [
+        { findOneAndRemove: true },
         { findOneAndRemove: true }
-      , { findOneAndRemove: true }
       ];
 
       before(function*() {
@@ -858,14 +880,17 @@ describe('yieldb', function() {
       });
 
       it('does not throw an error when no doc is found', function*() {
-        var doc = yield User.findOneAndRemove({ findOneAndRemove: true, asdf: '3hfa' });
+        var doc = yield User.findOneAndRemove({
+          findOneAndRemove: true,
+          asdf: '3hfa'
+        });
         assert.equal(null, doc);
       });
 
       describe('casts', function() {
         it('hexstring args to { _id: ObjectId(hexstring) }', function*() {
           var id = String(lastOfUs._id);
-          var doc= yield User.findOneAndRemove(id);
+          var doc = yield User.findOneAndRemove(id);
           assert(doc);
           assert.equal('Last Of Us', doc.name);
           yield User.insert(doc);
@@ -873,7 +898,7 @@ describe('yieldb', function() {
 
         it('hexstring _id to ObjectId(hexstring)', function*() {
           var id = String(lastOfUs._id);
-          var doc= yield User.findOneAndRemove({ _id: id });
+          var doc = yield User.findOneAndRemove({ _id: id });
           assert(doc);
           assert.equal('Last Of Us', doc.name);
           yield User.insert(doc);
@@ -897,7 +922,7 @@ describe('yieldb', function() {
 
       it('responds with a number', function*() {
         yield User.insert([{ counter: 'fun' }, { counter: 'stuff' }]);
-        var count = yield User.count({ counter: { $exists: true }});
+        var count = yield User.count({ counter: { $exists: true } });
         assert.equal(2, count);
       });
 
@@ -943,7 +968,7 @@ describe('yieldb', function() {
       });
 
       it('returns a promise', function(done) {
-        var fn = Dropper.insert({ large: 'r than life' })
+        var fn = Dropper.insert({ large: 'r than life' });
         fn(function(err) {
           if (err) return done(err);
           var p = Dropper.drop({});
@@ -974,8 +999,8 @@ describe('yieldb', function() {
       it('requires a key string', function() {
         var tests = [{}, Math, Math.max, [], undefined, null, 3, /asdf/];
 
-        tests.forEach(function(test){
-          assert.throws(function(){
+        tests.forEach(function(test) {
+          assert.throws(function() {
             User.distinct(test);
           });
         });
@@ -1036,7 +1061,7 @@ describe('yieldb', function() {
 
       it('accepts options', function*() {
         var info = yield User.indexes({ full: false });
-        assert('object' == typeof info && null != info);
+        assert(typeof info === 'object' && info != null);
         assert('_id_' in info);
       });
     });
@@ -1070,13 +1095,13 @@ describe('yieldb', function() {
         var def = {};
         def[name] = 1;
 
-        var res = yield User.index(def, { sparse: true });
+        yield User.index(def, { sparse: true });
         var info = yield User.indexes();
 
         var indexName = name + '_1';
 
         var exists = info.some(function(index) {
-          return index.name == indexName && !! index.sparse
+          return index.name === indexName && !!index.sparse;
         });
 
         assert(exists);
@@ -1110,13 +1135,13 @@ describe('yieldb', function() {
         var def = {};
         def[name] = 1;
 
-        var res = yield User.index(def, { sparse: true });
+        yield User.index(def, { sparse: true });
         var info = yield User.indexes();
         assert.equal(3, info.length);
 
         var indexDefString = name + '_1';
-        var res = yield User.dropIndex(indexDefString);
-        var info = yield User.indexes();
+        yield User.dropIndex(indexDefString);
+        info = yield User.indexes();
         assert.equal(2, info.length);
       });
 
@@ -1125,17 +1150,17 @@ describe('yieldb', function() {
         var def = {};
         def[name] = 1;
 
-        var res = yield User.index(def, { sparse: true });
+        yield User.index(def, { sparse: true });
         var info = yield User.indexes();
         assert.equal(3, info.length);
 
         var indexDefObject = def;
-        var res = yield User.dropIndex(indexDefObject);
-        var info = yield User.indexes();
+        yield User.dropIndex(indexDefObject);
+        info = yield User.indexes();
         assert.equal(2, info.length);
       });
 
-      it('rejects non-string, non-objects', function*(){
+      it('rejects non-string, non-objects', function*() {
         var invalids = [
           null,
           undefined,
@@ -1213,11 +1238,11 @@ describe('yieldb', function() {
           // https://github.com/pebble/yieldb/issues/11
 
           var resolved = false;
-          database.close().then(function(){
+          database.close().then(function() {
             resolved = true;
           }, done);
 
-          setTimeout(function(){
+          setTimeout(function() {
             assert(resolved, 'resolve fn did not fire');
             done();
           }, 5);
@@ -1318,16 +1343,16 @@ describe('yieldb', function() {
     describe('cast', function() {
       it('disallows non-hexstrings and object arguments', function(done) {
         var tests = [
-          function(){}
-        , 3
-        , 'asdf'
+          function() {},
+          3,
+          'asdf'
         ];
 
         tests.forEach(function(test) {
           assert.throws(function() {
             helper.cast(test);
           }, /invalid selector/);
-        })
+        });
 
         done();
       });
@@ -1343,7 +1368,7 @@ describe('yieldb', function() {
       describe('creates a function which when executed', function() {
         it('runs the function originally passed', function(done) {
           var ran = false;
-          var fn = helper.makeThen(function(){
+          var fn = helper.makeThen(function() {
             ran = true;
           });
 
@@ -1353,7 +1378,7 @@ describe('yieldb', function() {
         });
 
         it('returns a promise', function(done) {
-          var fn = helper.makeThen(function(){});
+          var fn = helper.makeThen(function() {});
           var p = fn();
           assert.equal('function', typeof p.then);
           done();

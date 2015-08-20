@@ -1,8 +1,6 @@
 'use strict';
 
 var debug = require('debug')('yieldb:db');
-var mongo = require('mongodb');
-var hasOwn = require('has-own');
 var assert = require('assert');
 var Collection = require('./collection');
 var helper = require('./helper');
@@ -33,7 +31,7 @@ Db.init = function*(database) {
   debug('initialize database');
   var db = new Db(database);
   return db;
-}
+};
 
 /**
  * Returns a promise which closes the database connection.
@@ -49,7 +47,7 @@ Db.prototype.close = function() {
   var fn = this.db.close.bind(this.db);
   fn.then = helper.makeThen(fn);
   return fn;
-}
+};
 
 /**
  * Returns a promise which deletes the _entire_ database.
@@ -65,7 +63,7 @@ Db.prototype.drop = function() {
   var fn = this.db.dropDatabase.bind(this.db);
   fn.then = helper.makeThen(fn);
   return fn;
-}
+};
 
 /**
  * Returns a promise which retreives the list of
@@ -83,7 +81,7 @@ Db.prototype.listCollections = function() {
   var fn = cursor.toArray.bind(cursor);
   fn.then = helper.makeThen(fn);
   return fn;
-}
+};
 
 /**
  * Creates a new collection object for the given `name`.
@@ -98,12 +96,15 @@ Db.prototype.listCollections = function() {
 Db.prototype.col = Db.prototype.collection = function(name) {
   debug('collection()');
 
-  if ('string' != typeof name)
+  if (typeof name !== 'string') {
     throw new TypeError('name must be a string');
+  }
 
   if (this.cols[name]) return this.cols[name];
-  return this.cols[name] = new Collection(this.db, name);
-}
+
+  this.cols[name] = new Collection(this.db, name);
+  return this.cols[name];
+};
 
 /**
  * Sends a ping to mongodb
@@ -123,7 +124,7 @@ Db.prototype.ping = function() {
   }
   ping.then = helper.makeThen(ping);
   return ping;
-}
+};
 
 /**
  * Even better for monitoring health but
@@ -147,4 +148,4 @@ Db.prototype.serverStatus = function() {
   }
   serverStatus.then = helper.makeThen(serverStatus);
   return serverStatus;
-}
+};

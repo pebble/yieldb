@@ -1,3 +1,4 @@
+'use strict';
 
 var debug = require('debug')('yieldb:collection');
 var hasOwn = require('has-own');
@@ -10,8 +11,9 @@ var cast = helper.cast;
 module.exports = Collection;
 
 function Collection(db, name) {
-  if (!(this instanceof Collection))
+  if (!(this instanceof Collection)) {
     return new Collection(db, name);
+  }
 
   debug('new collection', name);
 
@@ -34,7 +36,7 @@ function Collection(db, name) {
 
 Collection.prototype.setOptions = function(options) {
   this.query = mquery(this.col).setOptions(options).toConstructor();
-}
+};
 
 /**
  * Returns a query which when executed performs a find.
@@ -48,12 +50,12 @@ Collection.prototype.setOptions = function(options) {
  */
 
 Collection.prototype.find = function(selector, opts) {
-  opts || (opts = {});
+  if (!opts) opts = {};
 
   var matcher = cast(selector);
   var mq = this.query(matcher, opts);
   return mq;
-}
+};
 
 /**
  * Returns a query which when executed performs a findOne.
@@ -67,13 +69,13 @@ Collection.prototype.find = function(selector, opts) {
  */
 
 Collection.prototype.findOne = function(selector, opts) {
-  opts || (opts = {});
+  if (!opts) opts = {};
 
   var matcher = cast(selector);
   var mq = this.query().findOne(matcher);
   mq.setOptions(opts);
   return mq;
-}
+};
 
 /**
  * Returns thunk which when executed inserts
@@ -105,7 +107,7 @@ Collection.prototype.findOne = function(selector, opts) {
  */
 
 Collection.prototype.insert = function(obj, opts) {
-  opts || (opts = {});
+  if (!opts) opts = {};
 
   var isArray = Array.isArray(obj);
 
@@ -126,7 +128,7 @@ Collection.prototype.insert = function(obj, opts) {
 
   insert.then = helper.makeThen(insert);
   return insert;
-}
+};
 
 /**
  * Returns a query which when executed updates the
@@ -144,14 +146,14 @@ Collection.prototype.update = function(selector, cmd, opts) {
   if (!selector) throw new TypeError('missing selector argument');
   if (!isObject(cmd)) throw new TypeError('missing update argument');
 
-  opts || (opts = {});
+  if (!opts) opts = {};
   if (!hasOwn('multi', opts)) opts.multi = true;
   if (!hasOwn('fullResult', opts)) opts.fullResult = true;
 
   var matcher = cast(selector);
   var mq = this.query().update(matcher, cmd, opts);
   return mq;
-}
+};
 
 /**
  * Returns a query which when executed removes documents which
@@ -159,20 +161,21 @@ Collection.prototype.update = function(selector, cmd, opts) {
  *
  * @param {Object|ObjectId|hexString} selector
  * @param {Boolean} [options.multi] should remove multiple docs? default: true
- * @param {Boolean} [options.fullResult] should respond with verbose cmd output? default: true
+ * @param {Boolean} [options.fullResult] should respond with verbose cmd output?
+ *                                       default: true
  * @returns {mquery}
  */
 
 Collection.prototype.remove = function(selector, opts) {
   if (!selector) throw new TypeError('missing selector argument');
 
-  opts || (opts = {});
+  if (!opts) opts = {};
 
   // we use "multi" for consistency across our other methods
   if (!hasOwn('multi', opts)) opts.multi = true;
 
   // the driver uses "single" for col.remove()
-  hasOwn('single', opts) || (opts.single = !opts.multi);
+  if (!hasOwn('single', opts)) opts.single = !opts.multi;
   delete opts.multi;
 
   if (!hasOwn('fullResult', opts)) opts.fullResult = true;
@@ -181,7 +184,7 @@ Collection.prototype.remove = function(selector, opts) {
   var mq = this.query().remove(matcher);
   mq.setOptions(opts);
   return mq;
-}
+};
 
 /**
  * Returns thunk which when executed deletes
@@ -201,7 +204,7 @@ Collection.prototype.drop = function() {
 
   drop.then = helper.makeThen(drop);
   return drop;
-}
+};
 
 /**
  * Returns a thunk which when executed performs an
@@ -221,10 +224,11 @@ Collection.prototype.drop = function() {
  */
 
 Collection.prototype.aggregate = function(pipeline, opts) {
-  if (!Array.isArray(pipeline))
+  if (!Array.isArray(pipeline)) {
     throw new TypeError('pipeline must be an array');
+  }
 
-  opts || (opts = {});
+  if (!opts) opts = {};
 
   pipeline.forEach(function(op) {
     if (!(op && op.$match)) return;
@@ -249,11 +253,11 @@ Collection.prototype.aggregate = function(pipeline, opts) {
 
     // aggregate returns node 0.10 style stream
     return self.col.aggregate(pipeline, o);
-  }
+  };
 
   aggregate.then = helper.makeThen(aggregate);
   return aggregate;
-}
+};
 
 /**
  * Returns a query which when executed performs a
@@ -261,7 +265,8 @@ Collection.prototype.aggregate = function(pipeline, opts) {
  *
  * @param {Object|String|ObjectId} selector
  * @param {Object} updateCommand
- * @param {Boolean} [options.new] should respond with the document with modifications applied? default: true
+ * @param {Boolean} [options.new] should respond with the document with
+ *                                modifications applied? default: true
  * @param {Boolean} [options.upsert]
  * @param {String} [options.sort]
  * @returns {mquery}
@@ -271,7 +276,7 @@ Collection.prototype.findOneAndUpdate = function(selector, cmd, opts) {
   var matcher = cast(selector);
   var mq = this.query().findOneAndUpdate(matcher, cmd, opts);
   return mq;
-}
+};
 
 /**
  * Returns a query which when executed performs a
@@ -287,7 +292,7 @@ Collection.prototype.findOneAndRemove = function(selector, opts) {
   var matcher = cast(selector);
   var mq = this.query().findOneAndRemove(matcher, opts);
   return mq;
-}
+};
 
 /**
  * Returns a query which when executed performs a count.
@@ -302,7 +307,7 @@ Collection.prototype.count = function(selector, opts) {
   var mq = this.query().count(matcher);
   mq.setOptions(opts);
   return mq;
-}
+};
 
 /**
  * Returns a query which when executed performs a distinct command.
@@ -313,8 +318,9 @@ Collection.prototype.count = function(selector, opts) {
  */
 
 Collection.prototype.distinct = function(key, selector) {
-  if ('string' != typeof key)
+  if (typeof key !== 'string') {
     throw new TypeError('distinct expects a `key` string');
+  }
 
   var mq = this.query();
 
@@ -326,7 +332,7 @@ Collection.prototype.distinct = function(key, selector) {
   }
 
   return mq;
-}
+};
 
 /**
  * Returns an mquery builder for this collection passing
@@ -341,7 +347,7 @@ Collection.prototype.distinct = function(key, selector) {
 
 Collection.prototype.where = function(arg) {
   return this.query().where(arg);
-}
+};
 
 /**
  * Create an index
@@ -356,10 +362,9 @@ Collection.prototype.where = function(arg) {
 
 Collection.prototype.index = function(def, opts) {
   if (!def) throw new TypeError('missing index definition');
+  if (!opts) opts = {};
 
-  opts || (opts = {});
   var self = this;
-
   function index(cb) {
     debug('%s.index(%j, %j)', self.name, def, opts);
     self.col.ensureIndex(def, opts, cb);
@@ -367,7 +372,7 @@ Collection.prototype.index = function(def, opts) {
 
   index.then = helper.makeThen(index);
   return index;
-}
+};
 
 /**
  * Drop an index
@@ -404,7 +409,7 @@ Collection.prototype.dropIndex = function(def) {
 
   dropIndex.then = helper.makeThen(dropIndex);
   return dropIndex;
-}
+};
 
 function invalidIndexDefinitionError() {
   return new TypeError('invalid index definition: must be string or object');
@@ -420,7 +425,7 @@ function invalidIndexDefinitionError() {
  */
 
 Collection.prototype.indexes = function(opts) {
-  opts || (opts = {});
+  if (!opts) opts = {};
   if (!hasOwn('full', opts)) opts.full = true;
 
   var self = this;
@@ -431,7 +436,7 @@ Collection.prototype.indexes = function(opts) {
 
   indexes.then = helper.makeThen(indexes);
   return indexes;
-}
+};
 
 // TODO
 // mapReduce

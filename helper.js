@@ -1,3 +1,4 @@
+'use strict';
 
 var debug = require('debug')('yield:inputhelper');
 var isObject = require('is-object');
@@ -15,8 +16,9 @@ exports.cast = function cast(arg) {
     return { _id: new ObjectId(arg) };
   }
 
-  if (!isObject(arg))
+  if (!isObject(arg)) {
     throw new TypeError('invalid selector');
+  }
 
   // find(ObjectId)
   if (arg instanceof ObjectId) {
@@ -29,10 +31,10 @@ exports.cast = function cast(arg) {
   }
 
   return arg;
-}
+};
 
 function isHexString(arg) {
-  return 24 == arg.length && 'string' == typeof arg;
+  return arg.length === 24 && typeof arg === 'string';
 }
 
 /**
@@ -46,15 +48,15 @@ exports.ensureIsObjectAndHasId = function ensureIsObjectAndHasId(o) {
   }
 
   throw new TypeError('insert() accepts either a single object or array of objects');
-}
+};
 
 function ensureId(doc) {
   if (!hasOwn('_id', doc)) {
-    doc._id = new ObjectId;
+    doc._id = new ObjectId();
   }
 }
 
-exports.makeThen = function makeThen (fn) {
+exports.makeThen = function makeThen(fn) {
   return function then(resolve, reject) {
     var promise = new mquery.Promise(function(success, error) {
       fn(function(err, res) {
@@ -64,6 +66,6 @@ exports.makeThen = function makeThen (fn) {
       });
     });
     return promise.then(resolve, reject);
-  }
-}
+  };
+};
 

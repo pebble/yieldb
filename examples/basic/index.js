@@ -1,3 +1,4 @@
+'use strict';
 
 /**
  * To run:
@@ -11,7 +12,7 @@ var mongo = require('yieldb');
 
 module.exports = start;
 
-function* start () {
+function* start() {
   app.context.db = yield mongo.connect(process.env.MONGO_URI);
 
   var port = process.env.PORT;
