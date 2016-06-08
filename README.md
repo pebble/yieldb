@@ -6,6 +6,12 @@ Simple, expressive and yieldable MongoDB for [co](https://github.com/visionmedia
 [![Coverage Status](https://img.shields.io/coveralls/pebble/yieldb.svg)](https://coveralls.io/r/pebble/yieldb)
 [![npm](http://img.shields.io/npm/v/yieldb.svg)](https://www.npmjs.org/package/yieldb)
 
+### deprecated
+
+The [official MongoDB driver](https://github.com/mongodb/node-mongodb-native) now returns promises and supports yielding too. Therefore, this project is no longer being actively maintained. If you would like to keep using the query builder interface, you can do so by installing [mquery](https://github.com/aheckmann/mquery) as well.
+
+### uxample
+
 ```js
 var co = require('co');
 var connect = require('yieldb').connect;
